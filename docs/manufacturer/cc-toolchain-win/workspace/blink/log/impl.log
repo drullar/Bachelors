@@ -1,0 +1,556 @@
+GateMate (c) Place and Route
+Version 4.2 (1 January 2025)
+All Rights Reserved (c) Cologne Chip AG
+
+Command line Options:
+       h:  False
+       i: net/blink_synth.v
+       o:  blink
+     mXA:   True
+     mMA:   True
+    Cinp:  False
+   Coutp:  False
+     cdf:   True
+     pin:   True
+     plc:   True
+       s:   True
+     cCP:  False
+     gCP:  False
+      AF:   True
+      dC:   True
+    uCIO:  False
+      pB:       
+      sp:  False
+     crf:  False
+       v:  False
+      Gs:      0
+      om:      3
+      sf:    0.8
+      dl:   True
+      df:   True
+   m_spi:      0
+      pr:   True
+     cgb:  False
+    cgbc:  False
+     cgo:      0
+      tm:      3
+      tp:      0
+   s_spi:      0
+     ics:  False
+     lib:   ccag
+     ccf: src/blink.ccf
+   arcfg:  False
+     app:  False
+
+X_CONVERT Netlist Converter
+
+Library Mode used: CCAG_GateMate
+
+1261 Lines read
+
+found components:
+        CC_LUT3        21
+        CC_LUT4        11
+        CC_LUT2        16
+        CC_ADDF        34
+        CC_BUFG         1
+         CC_DFF        41
+         CC_MX4         2
+        CC_IBUF         1
+        CC_OBUF         1
+
+REMOVE_UNUSED
+         0 unused Components removed
+REMOVE_BUF_INV
+         0 BUF removed
+         0 INV removed
+REPLACE_LUTS
+REPLACE_OTHERS
+Number of inserted dummy components 0
+24 new components inserted
+WRITE_REFCOMP
+SAVE_NET
+
+Conversion finished!
+ASCII netlist generated: blink_x_convert.prn
+Time (s):       0.120
+
+Read blink.net
+
+MAPPER started
+
+Map Adder
+4 Adder chains mapped
+
+During map of 2 CPEs 2 gates deleted!
+
+14 CPEs replaced by double bit CPEs
+
+Number of Combined CPEs:    33
+
+PLACER started
+
+FanOut statistics:
+FO:      1 count:     65   61.3 %      connect count:     65   27.8 %  cumulated:     65   27.8 %
+FO:      2 count:     19   17.9 %      connect count:     38   16.2 %  cumulated:    103   44.0 %
+FO:      3 count:     10    9.4 %      connect count:     30   12.8 %  cumulated:    133   56.8 %
+FO:      4 count:      4    3.8 %      connect count:     16    6.8 %  cumulated:    149   63.7 %
+FO:      5 count:      2    1.9 %      connect count:     10    4.3 %  cumulated:    159   67.9 %
+FO:      6 count:      1    0.9 %      connect count:      6    2.6 %  cumulated:    165   70.5 %
+FO:      7 count:      1    0.9 %      connect count:      7    3.0 %  cumulated:    172   73.5 %
+FO:      8 count:      2    1.9 %      connect count:     16    6.8 %  cumulated:    188   80.3 %
+FO:     19 count:      1    0.9 %      connect count:     19    8.1 %  cumulated:    207   88.5 %
+FO:     27 count:      1    0.9 %      connect count:     27   11.5 %  cumulated:    234  100.0 %
+Number of Outputs:   106
+Average FanOut:     2.20
+
+FanIn statistics:
+FI:      1 count:      3    5.0 %      connect count:      3    1.3 %  cumulated:      3    1.3 %
+FI:      2 count:      6   10.0 %      connect count:     12    5.1 %  cumulated:     15    6.4 %
+FI:      3 count:     21   35.0 %      connect count:     63   26.9 %  cumulated:     78   33.3 %
+FI:      4 count:     10   16.7 %      connect count:     40   17.1 %  cumulated:    118   50.4 %
+FI:      5 count:     10   16.7 %      connect count:     50   21.4 %  cumulated:    168   71.8 %
+FI:      6 count:      7   11.7 %      connect count:     42   17.9 %  cumulated:    210   89.7 %
+FI:      8 count:      3    5.0 %      connect count:     24   10.3 %  cumulated:    234  100.0 %
+Number of Inputs:    60
+Average FanIn:     3.90
+
+Pins are placed from src/blink.ccf file
+WARNING: IO signal name in CCF file "rx" not found
+
+Centerpoint:  x: 71.33 y: 119.33
+
+Centerpoint:  x: 71.33 y: 119.33
+
+
+Time (s):       0.205
+
+Netlength (initial): 332.43
+
+Quadratisches Placement: TRUE
+    1  Netlength: 113.96   diff(%): 0.00000   0
+    2  Netlength: 106.60   diff(%): 6.90287   1
+    3  Netlength: 96.90   diff(%): 10.01181   1
+    4  Netlength: 87.36   diff(%): 10.92302   1
+    5  Netlength: 78.54   diff(%): 11.23132   1
+    6  Netlength: 70.54   diff(%): 11.34023   1
+    7  Netlength: 63.33   diff(%): 11.37915   1
+    8  Netlength: 56.85   diff(%): 11.39310   1
+    9  Netlength: 51.04   diff(%): 11.39811   1
+   10  Netlength: 45.81   diff(%): 11.39990   1
+   11  Netlength: 41.12   diff(%): 11.40055   1
+   12  Netlength: 36.92   diff(%): 11.40078   1
+   13  Netlength: 33.14   diff(%): 11.40086   1
+   14  Netlength: 29.75   diff(%): 11.40089   1
+   15  Netlength: 26.70   diff(%): 11.40090   1
+   16  Netlength: 23.97   diff(%): 11.40091   1
+   17  Netlength: 21.52   diff(%): 11.40091   1
+   18  Netlength: 19.31   diff(%): 11.40091   1
+   19  Netlength: 17.34   diff(%): 11.40091   1
+   20  Netlength: 15.56   diff(%): 11.40091   1
+   21  Netlength: 13.97   diff(%): 11.40091   1
+   22  Netlength: 12.54   diff(%): 11.40091   1
+   23  Netlength: 11.26   diff(%): 11.40091   1
+   24  Netlength: 10.11   diff(%): 11.40091   1
+   25  Netlength: 9.07   diff(%): 11.40091   1
+   26  Netlength: 8.14   diff(%): 11.40091   1
+   27  Netlength: 7.31   diff(%): 11.40091   1
+   28  Netlength: 6.56   diff(%): 11.40091   1
+   29  Netlength: 5.89   diff(%): 11.40091   1
+   30  Netlength: 5.29   diff(%): 11.40091   1
+   31  Netlength: 4.75   diff(%): 11.40091   1
+   32  Netlength: 4.26   diff(%): 11.40091   1
+   33  Netlength: 3.82   diff(%): 11.40091   1
+   34  Netlength: 3.43   diff(%): 11.40091   1
+   35  Netlength: 3.08   diff(%): 11.40091   1
+   36  Netlength: 2.77   diff(%): 11.40091   1
+   37  Netlength: 2.48   diff(%): 11.40091   1
+   38  Netlength: 2.23   diff(%): 11.40091   1
+   39  Netlength: 2.00   diff(%): 11.40091   1
+   40  Netlength: 1.80   diff(%): 11.40091   1
+   41  Netlength: 1.61   diff(%): 11.40091   1
+   42  Netlength: 1.45   diff(%): 11.40091   1
+   43  Netlength: 1.30   diff(%): 11.40091   1
+   44  Netlength: 1.17   diff(%): 11.40091   1
+   45  Netlength: 1.05   diff(%): 11.40091   1
+   46  Netlength: 0.94   diff(%): 11.40091   1
+   47  Netlength: 0.84   diff(%): 11.40091   1
+   48  Netlength: 0.76   diff(%): 11.40091   1
+   49  Netlength: 0.68   diff(%): 11.40091   1
+   50  Netlength: 0.61   diff(%): 11.40091   1
+   51  Netlength: 0.55   diff(%): 11.40091   1
+   52  Netlength: 0.49   diff(%): 11.40091   1
+   53  Netlength: 0.44   diff(%): 11.40091   1
+   54  Netlength: 0.40   diff(%): 11.40091   1
+   55  Netlength: 0.36   diff(%): 11.40091   1
+   56  Netlength: 0.32   diff(%): 11.40091   1
+   57  Netlength: 0.29   diff(%): 11.40091   1
+   58  Netlength: 0.26   diff(%): 11.40091   1
+   59  Netlength: 0.23   diff(%): 11.40091   1
+   60  Netlength: 0.21   diff(%): 11.40091   1
+   61  Netlength: 0.19   diff(%): 11.40091   1
+   62  Netlength: 0.17   diff(%): 11.40091   1
+   63  Netlength: 0.15   diff(%): 11.40091   1
+   64  Netlength: 0.13   diff(%): 11.40091   1
+   65  Netlength: 0.12   diff(%): 11.40091   1
+   66  Netlength: 0.11   diff(%): 11.40091   1
+   67  Netlength: 0.10   diff(%): 11.40091   1
+   68  Netlength: 0.09   diff(%): 11.40091   1
+   69  Netlength: 0.08   diff(%): 11.40091   1
+   70  Netlength: 0.07   diff(%): 11.40091   1
+   71  Netlength: 0.06   diff(%): 11.40091   1
+   72  Netlength: 0.06   diff(%): 11.40091   1
+   73  Netlength: 0.05   diff(%): 11.40091   1
+   74  Netlength: 0.05   diff(%): 11.40091   1
+   75  Netlength: 0.04   diff(%): 11.40091   1
+   76  Netlength: 0.04   diff(%): 11.40091   1
+   77  Netlength: 0.03   diff(%): 11.40091   1
+   78  Netlength: 0.03   diff(%): 11.40091   1
+   79  Netlength: 0.03   diff(%): 11.40091   1
+   80  Netlength: 0.02   diff(%): 11.40091   1
+   81  Netlength: 0.02   diff(%): 11.40091   1
+   82  Netlength: 0.02   diff(%): 11.40091   1
+   83  Netlength: 0.02   diff(%): 11.40091   1
+   84  Netlength: 0.02   diff(%): 11.40091   1
+   85  Netlength: 0.01   diff(%): 11.40091   1
+   86  Netlength: 0.01   diff(%): 11.40091   1
+   87  Netlength: 0.01   diff(%): 11.40091   1
+   88  Netlength: 0.01   diff(%): 11.40091   1
+   89  Netlength: 0.01   diff(%): 11.40091   1
+   90  Netlength: 0.01   diff(%): 11.40091   1
+   91  Netlength: 0.01   diff(%): 11.40091   1
+   92  Netlength: 0.01   diff(%): 11.40091   1
+   93  Netlength: 0.01   diff(%): 11.40091   1
+   94  Netlength: 0.01   diff(%): 11.40091   1
+   95  Netlength: 0.00   diff(%): 11.40091   1
+   96  Netlength: 0.00   diff(%): 11.40091   1
+   97  Netlength: 0.00   diff(%): 11.40091   1
+   98  Netlength: 0.00   diff(%): 11.40091   1
+   99  Netlength: 0.00   diff(%): 11.40091   1
+  100  Netlength: 0.00   diff(%): 11.40091   1
+  101  Netlength: 0.00   diff(%): 11.40091   1
+  102  Netlength: 0.00   diff(%): 11.40091   1
+  103  Netlength: 0.00   diff(%): 11.40091   1
+  104  Netlength: 0.00   diff(%): 11.40091   1
+  105  Netlength: 0.00   diff(%): 11.40091   1
+  106  Netlength: 0.00   diff(%): 11.40091   1
+  107  Netlength: 0.00   diff(%): 11.40091   1
+  108  Netlength: 0.00   diff(%): 11.40091   1
+  109  Netlength: 0.00   diff(%): 11.40091   1
+  110  Netlength: 0.00   diff(%): 11.40091   1
+  111  Netlength: 0.00   diff(%): 11.40091   1
+  112  Netlength: 0.00   diff(%): 11.40091   1
+  113  Netlength: 0.00   diff(%): 11.40091   1
+  114  Netlength: 0.00   diff(%): 11.40091   1
+  115  Netlength: 0.00   diff(%): 11.40091   1
+  116  Netlength: 0.00   diff(%): 11.40091   1
+  117  Netlength: 0.00   diff(%): 11.40091   1
+  118  Netlength: 0.00   diff(%): 11.40091   1
+  119  Netlength: 0.00   diff(%): 11.40091   1
+  120  Netlength: 0.00   diff(%): 11.40091   1
+  121  Netlength: 0.00   diff(%): 11.40091   1
+  122  Netlength: 0.00   diff(%): 11.40091   1
+  123  Netlength: 0.00   diff(%): 11.40091   1
+  124  Netlength: 0.00   diff(%): 11.40091   1
+  125  Netlength: 0.00   diff(%): 11.40091   1
+  126  Netlength: 0.00   diff(%): 11.40091   1
+  127  Netlength: 0.00   diff(%): 11.40091   1
+  128  Netlength: 0.00   diff(%): 11.40091   1
+  129  Netlength: 0.00   diff(%): 11.40091   1
+  130  Netlength: 0.00   diff(%): 11.40091   1
+  131  Netlength: 0.00   diff(%): 11.40091   1
+  132  Netlength: 0.00   diff(%): 11.40091   1
+  133  Netlength: 0.00   diff(%): 11.40091   1
+  134  Netlength: 0.00   diff(%): 11.40091   1
+  135  Netlength: 0.00   diff(%): 11.40091   1
+  136  Netlength: 0.00   diff(%): 11.40091   1
+  137  Netlength: 0.00   diff(%): 11.40091   1
+  138  Netlength: 0.00   diff(%): 11.40091   1
+  139  Netlength: 0.00   diff(%): 11.40091   1
+  140  Netlength: 0.00   diff(%): 11.40091   1
+  141  Netlength: 0.00   diff(%): 11.40091   1
+  142  Netlength: 0.00   diff(%): 11.40091   1
+  143  Netlength: 0.00   diff(%): 11.40091   1
+  144  Netlength: 0.00   diff(%): 11.40091   1
+  145  Netlength: 0.00   diff(%): 11.40092   1
+  146  Netlength: 0.00   diff(%): 11.40090   1
+  147  Netlength: 0.00   diff(%): 11.40092   1
+  148  Netlength: 0.00   diff(%): 11.40090   1
+  149  Netlength: 0.00   diff(%): 11.40092   1
+  150  Netlength: 0.00   diff(%): 11.40090   1
+  151  Netlength: 0.00   diff(%): 11.40094   1
+  152  Netlength: 0.00   diff(%): 11.40089   1
+  153  Netlength: 0.00   diff(%): 11.40091   1
+  154  Netlength: 0.00   diff(%): 11.40089   1
+  155  Netlength: 0.00   diff(%): 11.40094   1
+  156  Netlength: 0.00   diff(%): 11.40090   1
+  157  Netlength: 0.00   diff(%): 11.40090   1
+  158  Netlength: 0.00   diff(%): 11.40094   1
+  159  Netlength: 0.00   diff(%): 11.40089   1
+  160  Netlength: 0.00   diff(%): 11.40090   1
+  161  Netlength: 0.00   diff(%): 11.40091   1
+  162  Netlength: 0.00   diff(%): 11.40090   1
+  163  Netlength: 0.00   diff(%): 11.40090   1
+  164  Netlength: 0.00   diff(%): 11.40095   1
+  165  Netlength: 0.00   diff(%): 11.40087   1
+  166  Netlength: 0.00   diff(%): 11.40094   1
+  167  Netlength: 0.00   diff(%): 11.40091   1
+  168  Netlength: 0.00   diff(%): 11.40087   1
+  169  Netlength: 0.00   diff(%): 11.40086   1
+  170  Netlength: 0.00   diff(%): 11.40100   1
+  171  Netlength: 0.00   diff(%): 11.40094   1
+  172  Netlength: 0.00   diff(%): 11.40078   1
+  173  Netlength: 0.00   diff(%): 11.40092   1
+  174  Netlength: 0.00   diff(%): 11.40091   1
+  175  Netlength: 0.00   diff(%): 11.40083   1
+  176  Netlength: 0.00   diff(%): 11.40131   1
+  177  Netlength: 0.00   diff(%): 11.40051   1
+  178  Netlength: 0.00   diff(%): 11.40094   1
+  179  Netlength: 0.00   diff(%): 11.40116   1
+  180  Netlength: 0.00   diff(%): 11.40077   1
+  181  Netlength: 0.00   diff(%): 11.40103   1
+  182  Netlength: 0.00   diff(%): 11.40093   1
+  183  Netlength: 0.00   diff(%): 11.40076   1
+  184  Netlength: 0.00   diff(%): 11.40109   1
+  185  Netlength: 0.00   diff(%): 11.40068   1
+  186  Netlength: 0.00   diff(%): 11.40096   1
+  187  Netlength: 0.00   diff(%): 11.40079   1
+  188  Netlength: 0.00   diff(%): 11.40110   1
+  189  Netlength: 0.00   diff(%): 11.40075   1
+  190  Netlength: 0.00   diff(%): 11.40081   1
+  191  Netlength: 0.00   diff(%): 11.40086   1
+  192  Netlength: 0.00   diff(%): 11.40101   1
+  193  Netlength: 0.00   diff(%): 11.40047   1
+  194  Netlength: 0.00   diff(%): 11.40194   1
+  195  Netlength: 0.00   diff(%): 11.40141   1
+  196  Netlength: 0.00   diff(%): 11.39929   1
+  197  Netlength: 0.00   diff(%): 11.40201   1
+  198  Netlength: 0.00   diff(%): 11.40249   1
+  199  Netlength: 0.00   diff(%): 11.39963   1
+  200  Netlength: 0.00   diff(%): 11.40210   1
+  201  Netlength: 0.00   diff(%): 11.40006   1
+  202  Netlength: 0.00   diff(%): 11.39991   2
+
+Time (s):       0.299
+
+CPE Component Statistics:
+          OR         1         1%
+         AND        51        58%
+       ORAND         2         2%
+        MX4a         3         3%
+        ADDF         2         2%
+       ADDF2        28        32%
+              --------
+Sum of COMB:        87
+
+           D        41        91%
+       C_0_1         4         8%
+              --------
+Sum of SEQ:         45
+
+Sum of all:        132
+
+Time (s):       0.845
+
+4 Adder Chains inserted
+
+Netlength after adder insertion: 748.00
+
+Time (s):       0.860
+
+CPE input statistics:
+Fanin:  1 count:      1   CPE %:  1.7
+Fanin:  2 count:      6   CPE %: 10.3
+Fanin:  3 count:     21   CPE %: 36.2
+Fanin:  4 count:     10   CPE %: 17.2
+Fanin:  5 count:     10   CPE %: 17.2
+Fanin:  6 count:      7   CPE %: 12.1
+Fanin:  7 count:      0   CPE %:  0.0
+Fanin:  8 count:      3   CPE %:  5.2
+Average:  4.00
+Number of Netlist Components:    58
+Number of Inputs:   232
+
+ROUTER started
+Number of usable Bridges using OUT2: 20438
+Number of Bridges to insert: 9
+
+
+Netlength after Bridge Insert:        681
+
+Time (s):       1.465
+
+Preroute fixed connections
+.
+FanOut statistics:
+FO:      1 count:     31   41.9 %      connect count:     31   12.7 %  cumulated:     31   12.7 %
+FO:      2 count:      6    8.1 %      connect count:     12    4.9 %  cumulated:     43   17.6 %
+FO:      3 count:     15   20.3 %      connect count:     45   18.4 %  cumulated:     88   36.1 %
+FO:      4 count:     11   14.9 %      connect count:     44   18.0 %  cumulated:    132   54.1 %
+FO:      5 count:      1    1.4 %      connect count:      5    2.0 %  cumulated:    137   56.1 %
+FO:      6 count:      3    4.1 %      connect count:     18    7.4 %  cumulated:    155   63.5 %
+FO:      7 count:      3    4.1 %      connect count:     21    8.6 %  cumulated:    176   72.1 %
+FO:      8 count:      2    2.7 %      connect count:     16    6.6 %  cumulated:    192   78.7 %
+FO:     25 count:      1    1.4 %      connect count:     25   10.2 %  cumulated:    217   88.9 %
+FO:     27 count:      1    1.4 %      connect count:     27   11.1 %  cumulated:    244  100.0 %
+Number of Outputs:    74
+Average FanOut:     3.29
+
+FanIn statistics:
+FI:      1 count:      3    5.0 %      connect count:      3    1.3 %  cumulated:      3    1.3 %
+FI:      2 count:      6   10.0 %      connect count:     12    5.1 %  cumulated:     15    6.4 %
+FI:      3 count:     21   35.0 %      connect count:     63   26.9 %  cumulated:     78   33.3 %
+FI:      4 count:     10   16.7 %      connect count:     40   17.1 %  cumulated:    118   50.4 %
+FI:      5 count:     10   16.7 %      connect count:     50   21.4 %  cumulated:    168   71.8 %
+FI:      6 count:      7   11.7 %      connect count:     42   17.9 %  cumulated:    210   89.7 %
+FI:      8 count:      3    5.0 %      connect count:     24   10.3 %  cumulated:    234  100.0 %
+Number of Inputs:    60
+Average FanIn:     3.90
+
+Time (s):       1.507
+..............
+
+Route statistics:   MUX/Con: 1.25   not routed: 90   Ripups: 0
+mode:1
+.
+
+Route statistics:   MUX/Con: 1.22   not routed: 79   Ripups: 0
+mode:2
+........
+
+Route statistics:   MUX/Con: 1.56   not routed: 0   Ripups: 0
+mode:3
+
+Time (s):       1.555
+
+Time (s):       1.616
+
+
+SDF Generation
+
+Time (s):       1.654
+
+Static Timing Analysis
+Longest Path from Q of Component 16_2 to D-Input of Component 14/5 Delay: 8129 ps
+Maximum Clock Frequency on CLK 84 (84/1):  123.02 MHz
+
+Path details:
+     16_2 x71y120    CLK -> Q                                                         CPE-del:   443 ps   path-del:   443 ps
+     16_2 x71y120  ->     156/2 x75y117 C_////Bridge            route-del:  1531 ps   CPE-del:   386 ps   path-del:  2350 ps
+    156_2 x75y117  ->       7/5 x73y118 C_AND///AND/            route-del:   657 ps   CPE-del:   500 ps   path-del:  3487 ps
+      7_1 x73y118  ->      48/2 x73y117 C_AND////D              route-del:  1402 ps   CPE-del:   562 ps   path-del:  5434 ps
+     48_1 x73y117  ->      14/5 x70y125 C_AND/D//AND/D          route-del:  1624 ps   CPE-del:   367 ps   path-del:  7431 ps
+                           14/5 x70y125  Setup D                route-del:   100 ps                       path-del:  7531 ps
+16/9 x71y120 - 14/9 x70y125       Clk-Skew                      route-del:   598 ps                       path-del:  8129 ps
+
+
+Time (s):       1.655
+
+
+
+
+
+Time (s):       1.664
+
+
+SDF Generation
+
+Time (s):       1.712
+
+Static Timing Analysis
+
+Skew violation report using only 80% delay of data path
+
+Skew Warning on clock net 84_1 at D2-Input of Component 48 coming from Component 21_2 Min-Delay: 183 ps
+
+
+Longest Path from Q of Component 16_2 to D-Input of Component 14/5 Delay: 8129 ps
+Maximum Clock Frequency on CLK 84 (84/1):  123.02 MHz
+
+Path details:
+     16_2 x71y120    CLK -> Q                                                         CPE-del:   443 ps   path-del:   443 ps
+     16_2 x71y120  ->     156/2 x75y117 C_////Bridge            route-del:  1531 ps   CPE-del:   386 ps   path-del:  2350 ps
+    156_2 x75y117  ->       7/5 x73y118 C_AND///AND/            route-del:   657 ps   CPE-del:   500 ps   path-del:  3487 ps
+      7_1 x73y118  ->      48/2 x73y117 C_AND////D              route-del:  1402 ps   CPE-del:   562 ps   path-del:  5434 ps
+     48_1 x73y117  ->      14/5 x70y125 C_AND/D//AND/D          route-del:  1624 ps   CPE-del:   367 ps   path-del:  7431 ps
+                           14/5 x70y125  Setup D                route-del:   100 ps                       path-del:  7531 ps
+16/9 x71y120 - 14/9 x70y125       Clk-Skew                      route-del:   598 ps                       path-del:  8129 ps
+
+
+
+Longest Path from Q of Component 28 to Output via Output-Buffer 128 Delay: 4593 ps
+
+
+Time (s):       1.714
+
+Utilization Report
+
+ CPEs                     65 /  20480  (  0.3 %)
+ -----------------------------------------------
+   CPE Config           49.0 /  20480  (  0.2 %)
+     CPE4                 26
+     CPE8                 36
+     Bridges               9
+   CPE Registers          41 /  40960  (  0.1 %)
+     Flip-flops           41
+     Latches               0
+
+ Routing Resources
+ -----------------------------------------------
+   INMUX                 403 / 245760  (  0.2 %)
+   OUTMUX                 29 /  40960  (  0.1 %)
+   SB_BIG_MUX            209 / 324720  (  0.1 %)
+   SB_SML_MUX            226 / 324720  (  0.1 %)
+
+ GPIOs                     2 /    144  (  1.4 %)
+ -----------------------------------------------
+   Single-ended            2 /    144  (  1.4 %)
+     IBF                   1
+     OBF                   1
+     TOBF                  0
+     IOBF                  0
+   LVDS pairs              0 /     72  (  0.0 %)
+     IBF                   0
+     OBF                   0
+     TOBF                  0
+     IOBF                  0
+
+ GPIO Registers            0 /    288  (  0.0 %)
+ -----------------------------------------------
+   FF_IBF                  0
+   FF_OBF                  0
+   IDDR                    0
+   ODDR                    0
+
+ Block RAMs              0.0 /     32  (  0.0 %)
+ -----------------------------------------------
+   BRAM_20K                0 /     64  (  0.0 %)
+   BRAM_40K                0 /     32  (  0.0 %)
+   FIFO_40K                0 /     32  (  0.0 %)
+
+ PLLs                      0 /      4  (  0.0 %)
+ GLBs                      1 /      4  ( 25.0 %)
+ SerDes                    0 /      1  (  0.0 %)
+
+
+
+
+Verilog Netlist Generation
+
+before generate_netlist Time (s):       1.842
+
+
+
+                        blink_00.vGatecount:     73
+
+
+
+Time (s):       1.861
+
+Generate SDF for fast simulation
+
+CFG-File Generation
+
+Time (s):       2.004
+
+End of Place & Route

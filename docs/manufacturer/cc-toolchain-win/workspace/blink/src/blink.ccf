@@ -1,0 +1,6 @@
+# Clock (100 MHz)
+Net "clk"  Loc = "IO_SB_A8" | SCHMITT_TRIGGER=true;
+
+# UART Pins
+Net "rx" Loc = "IO_EB_B3";  # Input from Arduino (Pin 0)
+Net "tx" Loc = "IO_EB_B1";  # Output to Arduino (Pin 1)

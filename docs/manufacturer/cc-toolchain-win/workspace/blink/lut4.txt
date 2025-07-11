@@ -1,0 +1,7 @@
+0001   1 abcd
+0100   4 abcD
+0503   1 DC?b:a:0:0
+1F00   1 ((ab)+c)D
+8000   3 ABCD
+FE00   1 ((/ab\)+C)D
+ Gesamt:   11 DS4:     1
