@@ -1,4 +1,6 @@
-000E   1 c/ab\
-0070  19 C/AB\
-0080   1 ABC
- Gesamt:   21 DS4:     0
+000B   1 c/aB\
+0010   2 abC
+0040   1 aBC
+00CA   1 C?A:B
+00E0   1 C/ab\
+ Gesamt:    6 DS4:     0

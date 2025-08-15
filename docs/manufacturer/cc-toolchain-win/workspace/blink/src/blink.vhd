@@ -1,73 +1,94 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 entity blink is
-port (
-    clk      : in  std_logic;          -- 100 MHz clock
-    tx       : out std_logic           -- Serial output (IO_EB_B1)
-);
-end entity;
+    Port (
+        clk      : in  STD_LOGIC;   -- 100 MHz clock
+        tx   : out STD_LOGIC    -- Serial output
+    );
+end blink;
 
-architecture rtl of blink is
-    -- 300 baud @ 100MHz (100,000,000 / 300 = 333,333 cycles)
-    constant BAUD_COUNT : integer := 333333;
-    signal baud_counter : integer range 0 to BAUD_COUNT-1 := 0;
-    signal baud_tick    : std_logic := '0';
+architecture Behavioral of blink is
+    -- Constants
+    constant BAUD_RATE      : integer := 9600;
+    constant CLOCK_FREQ     : integer := 100000000; -- 100 MHz
+    constant BAUD_COUNT     : integer := CLOCK_FREQ / BAUD_RATE;
+    constant DATA_BYTE      : STD_LOGIC_VECTOR(7 downto 0) := "01010101"; -- Constant data to send (0x55)
+    constant DELAY_CYCLES   : integer := CLOCK_FREQ / 10; -- 0.1 second delay between transmissions
     
-    -- Data Generation
-    signal data_counter : unsigned(7 downto 0) := (others => '0');
-    signal tx_data      : std_logic_vector(7 downto 0);
+    -- States for the state machine
+    type state_type is (IDLE, START_BIT, DATA_BITS, STOP_BIT, DELAY);
+    signal state : state_type := IDLE;
+    
+    -- Counters and registers
+    signal baud_counter     : integer range 0 to BAUD_COUNT-1 := 0;
+    signal bit_index        : integer range 0 to 7 := 0;
+    signal delay_counter    : integer range 0 to DELAY_CYCLES-1 := 0;
+    
+    -- Data register
+    signal data_reg         : STD_LOGIC_VECTOR(7 downto 0) := DATA_BYTE;
+    
 begin
 
-    -- Baud Rate Generator
     process(clk)
     begin
         if rising_edge(clk) then
-            if baud_counter = BAUD_COUNT-1 then
-                baud_counter <= 0;
-                baud_tick <= '1';
-            else
-                baud_counter <= baud_counter + 1;
-                baud_tick <= '0';
-            end if;
+            case state is
+                when IDLE =>
+                    tx <= '1'; -- Idle high
+                    data_reg <= DATA_BYTE; -- Reload constant data
+                    state <= START_BIT;
+                    baud_counter <= 0;
+                    
+                when START_BIT =>
+                    tx <= '0'; -- Start bit
+                    
+                    if baud_counter < BAUD_COUNT-1 then
+                        baud_counter <= baud_counter + 1;
+                    else
+                        baud_counter <= 0;
+                        state <= DATA_BITS;
+                        bit_index <= 0;
+                    end if;
+                    
+                when DATA_BITS =>
+                    tx <= data_reg(bit_index); -- Send current bit
+                    
+                    if baud_counter < BAUD_COUNT-1 then
+                        baud_counter <= baud_counter + 1;
+                    else
+                        baud_counter <= 0;
+                        
+                        if bit_index < 7 then
+                            bit_index <= bit_index + 1;
+                        else
+                            state <= STOP_BIT;
+                        end if;
+                    end if;
+                    
+                when STOP_BIT =>
+                    tx <= '1'; -- Stop bit
+                    
+                    if baud_counter < BAUD_COUNT-1 then
+                        baud_counter <= baud_counter + 1;
+                    else
+                        baud_counter <= 0;
+                        state <= DELAY;
+                        delay_counter <= 0;
+                    end if;
+                    
+                when DELAY =>
+                    if delay_counter < DELAY_CYCLES-1 then
+                        delay_counter <= delay_counter + 1;
+                    else
+                        state <= IDLE; -- Start new transmission
+                    end if;
+                    
+                when others =>
+                    state <= IDLE;
+            end case;
         end if;
     end process;
 
-    -- Data Counter (0-255)
-    process(clk)
-    begin
-        if rising_edge(clk) then
-            if baud_tick = '1' then
-                if data_counter = 255 then
-                    data_counter <= (others => '0'); -- Reset to 0 after 255
-                else
-                    data_counter <= data_counter + 1; -- Increment
-                end if;
-            end if;
-        end if;
-    end process;
-
-    -- UART Transmitter
-    process(clk)
-        variable bit_count : integer range 0 to 10 := 0;
-    begin
-        if rising_edge(clk) then
-            if baud_tick = '1' then
-                case bit_count is
-                    when 0 =>  -- Start bit
-                        tx <= '0';
-                        tx_data <= std_logic_vector(data_counter); -- Latch current value
-                        bit_count := 1;
-                    when 1 to 8 =>  -- Data bits (LSB first)
-                        tx <= tx_data(bit_count-1);
-                        bit_count := bit_count + 1;
-                    when 9 =>  -- Stop bit
-                        tx <= '1';
-                        bit_count := 0;
-                    when others => null;
-                end case;
-            end if;
-        end if;
-    end process;
-end architecture;
+end Behavioral;
