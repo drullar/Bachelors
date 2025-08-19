@@ -1,6 +1,9 @@
-00FE   1 ((/ab\)+C)d
-0100   1 abcD
-0B00   1 cD/aB\
-4F1B   1 AB?/CD\:c:D:c
+000B   1 cd/aB\
+0700   1 cD/AB\
+0E00  26 cD/ab\
+1400   1 D(B^C)a
+5C00   1 D(c?a:B)
 7F00   1 ((/AB\)+c)D
- Gesamt:    5 DS4:     1
+8FAB   1 AC?/Bd\:1:0:/bD\
+B0BB   1 /aB\(d+C)
+ Gesamt:   33 DS4:     1
