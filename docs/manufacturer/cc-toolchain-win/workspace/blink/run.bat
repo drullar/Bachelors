@@ -6,7 +6,7 @@ set PR=../../bin/p_r/p_r.exe
 set OFL=../../bin/openFPGALoader/openFPGALoader.exe
 
 :: project name and sources
-set TOP=blink
+set TOP="%2"
 set VLOG_SRC=src/blink.v
 set VHDL_SRC=src/blink.vhd
 set LOG=0

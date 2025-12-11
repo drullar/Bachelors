@@ -1,104 +1,43 @@
 # placefile for Design blink_00
-# 2025-08-11 22:36:26
+# 2025-08-18 21:57:48
 
-CPE 1 PosX 0 PosY 0; 
-CPE 2 PosX 70 PosY 115; 
-CPE 4 PosX 70 PosY 114; 
-CPE 6 PosX 72 PosY 113; 
-CPE 7 PosX 71 PosY 120; 
-CPE 8 PosX 71 PosY 126; 
-CPE 10 PosX 70 PosY 112; 
-CPE 12 PosX 70 PosY 110; 
-CPE 13 PosX 71 PosY 119; 
-CPE 14 PosX 73 PosY 122; 
-CPE 15 PosX 72 PosY 115; 
-CPE 16 PosX 71 PosY 110; 
-CPE 17 PosX 73 PosY 110; 
-CPE 19 PosX 70 PosY 111; 
-CPE 21 PosX 69 PosY 122; 
-CPE 23 PosX 66 PosY 115; 
-CPE 25 PosX 67 PosY 117; 
-CPE 27 PosX 68 PosY 125; 
-CPE 28 PosX 69 PosY 123; 
-CPE 29 PosX 69 PosY 125; 
-CPE 30 PosX 71 PosY 116; 
-CPE 31 PosX 71 PosY 117; 
-CPE 33 PosX 72 PosY 117; 
-CPE 34 PosX 67 PosY 114; 
-CPE 35 PosX 72 PosY 124; 
-CPE 38 PosX 73 PosY 119; 
-CPE 39 PosX 72 PosY 118; 
-CPE 41 PosX 70 PosY 113; 
-CPE 44 PosX 72 PosY 121; 
-CPE 45 PosX 71 PosY 122; 
-CPE 46 PosX 69 PosY 124; 
-CPE 47 PosX 68 PosY 121; 
-CPE 51 PosX 68 PosY 124; 
-CPE 52 PosX 69 PosY 121; 
-CPE 54 PosX 72 PosY 120; 
-CPE 56 PosX 70 PosY 116; 
-CPE 59 PosX 68 PosY 114; # Adder: column: 1  row: 7
-CPE 61 PosX 68 PosY 115; # Adder: column: 1  row: 8
-CPE 63 PosX 68 PosY 116; # Adder: column: 1  row: 9
-CPE 65 PosX 68 PosY 117; # Adder: column: 1  row: 10
-CPE 67 PosX 68 PosY 118; # Adder: column: 1  row: 11
-CPE 68 PosX 68 PosY 109; # Adder: column: 1  row: 2
-CPE 70 PosX 68 PosY 119; # Adder: column: 1  row: 12
-CPE 72 PosX 68 PosY 120; # Adder: column: 1  row: 13
-CPE 74 PosX 68 PosY 110; # Adder: column: 1  row: 3
-CPE 76 PosX 68 PosY 111; # Adder: column: 1  row: 4
-CPE 78 PosX 68 PosY 112; # Adder: column: 1  row: 5
-CPE 80 PosX 68 PosY 113; # Adder: column: 1  row: 6
-CPE 81 PosX 68 PosY 108; # Adder: column: 1  row: 1
-CPE 83 PosX 70 PosY 123; # Adder: column: 2  row: 7
-CPE 85 PosX 70 PosY 124; # Adder: column: 2  row: 8
-CPE 86 PosX 70 PosY 118; # Adder: column: 2  row: 2
-CPE 88 PosX 70 PosY 119; # Adder: column: 2  row: 3
-CPE 90 PosX 70 PosY 120; # Adder: column: 2  row: 4
-CPE 92 PosX 70 PosY 121; # Adder: column: 2  row: 5
-CPE 94 PosX 70 PosY 122; # Adder: column: 2  row: 6
-CPE 95 PosX 70 PosY 117; # Adder: column: 2  row: 1
-CPE 97 PosX 67 PosY 124; # Adder: column: 3  row: 7
-CPE 99 PosX 67 PosY 125; # Adder: column: 3  row: 8
-CPE 100 PosX 67 PosY 119; # Adder: column: 3  row: 2
-CPE 102 PosX 67 PosY 120; # Adder: column: 3  row: 3
-CPE 104 PosX 67 PosY 121; # Adder: column: 3  row: 4
-CPE 106 PosX 67 PosY 122; # Adder: column: 3  row: 5
-CPE 108 PosX 67 PosY 123; # Adder: column: 3  row: 6
-CPE 109 PosX 67 PosY 118; # Adder: column: 3  row: 1
-CPE 110 PosX 71 PosY 123; # Adder: column: 4  row: 2
-CPE 112 PosX 71 PosY 122; # Adder: column: 4  row: 1
-CPE 114 PosX 69 PosY 114; # Adder: column: 5  row: 7
-CPE 116 PosX 69 PosY 115; # Adder: column: 5  row: 8
-CPE 118 PosX 69 PosY 116; # Adder: column: 5  row: 9
-CPE 120 PosX 69 PosY 117; # Adder: column: 5  row: 10
-CPE 122 PosX 69 PosY 118; # Adder: column: 5  row: 11
-CPE 123 PosX 69 PosY 109; # Adder: column: 5  row: 2
-CPE 125 PosX 69 PosY 119; # Adder: column: 5  row: 12
-CPE 127 PosX 69 PosY 120; # Adder: column: 5  row: 13
-CPE 129 PosX 69 PosY 110; # Adder: column: 5  row: 3
-CPE 131 PosX 69 PosY 111; # Adder: column: 5  row: 4
-CPE 133 PosX 69 PosY 112; # Adder: column: 5  row: 5
-CPE 135 PosX 69 PosY 113; # Adder: column: 5  row: 6
-CPE 137 PosX 0 PosY 0; 
-IBF 182 PosX 0 PosY 101;
-OBF 183 PosX 103 PosY 129;
-CPE 184 PosX 71 PosY 119; 
-CPE 186 PosX 72 PosY 124; 
-CPE 187 PosX 69 PosY 108; # Adder: column: 5  row: 1
-CPE 190 PosX 72 PosY 115; 
-CPE 191 PosX 68 PosY 121; # Adder: column: 1  row: 14
-CPE 192 PosX 70 PosY 125; # Adder: column: 2  row: 9
-CPE 193 PosX 103 PosY 128; 
-CPE_bridge 194 PosX 67 PosY 111;
-CPE 194 PosX 67 PosY 111; 
-CPE_bridge 195 PosX 74 PosY 117;
-CPE 195 PosX 74 PosY 117; 
-CPE_bridge 196 PosX 72 PosY 122;
-CPE 196 PosX 72 PosY 122; 
-CPE_bridge 197 PosX 74 PosY 120;
-CPE 197 PosX 74 PosY 120; 
-CPE_bridge 198 PosX 73 PosY 115;
-CPE 198 PosX 73 PosY 115; 
-CPE_bridge 199 PosX 69 PosY 120;
-CPE 199 PosX 69 PosY 120; 
+CPE 1 PosX 70 PosY 113; 
+CPE 2 PosX 67 PosY 114; 
+CPE 3 PosX 67 PosY 120; 
+CPE 4 PosX 0 PosY 0; 
+CPE 5 PosX 70 PosY 124; 
+CPE 7 PosX 71 PosY 121; 
+CPE 9 PosX 68 PosY 124; 
+CPE 11 PosX 70 PosY 118; 
+CPE 12 PosX 67 PosY 121; 
+CPE 14 PosX 67 PosY 118; 
+CPE 15 PosX 67 PosY 115; 
+CPE 17 PosX 67 PosY 121; 
+CPE 18 PosX 68 PosY 122; 
+CPE 19 PosX 69 PosY 121; 
+CPE 23 PosX 69 PosY 115; # Adder: column: 1  row: 2
+CPE 25 PosX 69 PosY 116; # Adder: column: 1  row: 3
+CPE 27 PosX 69 PosY 117; # Adder: column: 1  row: 4
+CPE 29 PosX 69 PosY 118; # Adder: column: 1  row: 5
+CPE 31 PosX 69 PosY 119; # Adder: column: 1  row: 6
+CPE 32 PosX 69 PosY 114; # Adder: column: 1  row: 1
+CPE 33 PosX 68 PosY 123; # Adder: column: 2  row: 2
+CPE 35 PosX 68 PosY 122; # Adder: column: 2  row: 1
+CPE 36 PosX 68 PosY 117; # Adder: column: 3  row: 2
+CPE 38 PosX 68 PosY 118; # Adder: column: 3  row: 3
+CPE 40 PosX 68 PosY 119; # Adder: column: 3  row: 4
+CPE 43 PosX 0 PosY 0; 
+CPE 55 PosX 69 PosY 122; 
+IBF 60 PosX 0 PosY 101;
+OBF 61 PosX 103 PosY 129;
+CPE 62 PosX 70 PosY 119; 
+CPE 63 PosX 68 PosY 116; # Adder: column: 3  row: 1
+CPE 64 PosX 68 PosY 120; # Adder: column: 3  row: 5
+CPE 68 PosX 69 PosY 124; 
+CPE 76 PosX 69 PosY 123; 
+CPE 77 PosX 70 PosY 121; 
+CPE 78 PosX 103 PosY 128; 
+CPE_bridge 79 PosX 72 PosY 124;
+CPE 79 PosX 72 PosY 124; 
+CPE_bridge 80 PosX 68 PosY 121;
+CPE 80 PosX 68 PosY 121; 

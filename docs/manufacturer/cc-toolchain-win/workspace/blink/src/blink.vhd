@@ -4,15 +4,15 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity blink is
     Port (
-        clk      : in  STD_LOGIC;   -- 100 MHz clock
-        tx   : out STD_LOGIC    -- Serial output
+        clk       : in  STD_LOGIC;   -- 10 MHz clock
+        tx        : out STD_LOGIC   -- Serial output
     );
 end blink;
 
 architecture Behavioral of blink is
     -- Constants
     constant BAUD_RATE      : integer := 9600;
-    constant CLOCK_FREQ     : integer := 100000000; -- 100 MHz
+    constant CLOCK_FREQ     : integer := 10000000; -- 10 MHz
     constant BAUD_COUNT     : integer := CLOCK_FREQ / BAUD_RATE;
     constant DATA_BYTE      : STD_LOGIC_VECTOR(7 downto 0) := "01010101"; -- Constant data to send (0x55)
     constant DELAY_CYCLES   : integer := CLOCK_FREQ / 10; -- 0.1 second delay between transmissions
@@ -74,20 +74,14 @@ begin
                         baud_counter <= baud_counter + 1;
                     else
                         baud_counter <= 0;
-                        state <= DELAY;
+                        state <= IDLE;
                         delay_counter <= 0;
-                    end if;
-                    
-                when DELAY =>
-                    if delay_counter < DELAY_CYCLES-1 then
-                        delay_counter <= delay_counter + 1;
-                    else
-                        state <= IDLE; -- Start new transmission
                     end if;
                     
                 when others =>
                     state <= IDLE;
             end case;
+
         end if;
     end process;
 

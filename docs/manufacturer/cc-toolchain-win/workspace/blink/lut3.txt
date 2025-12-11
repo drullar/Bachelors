@@ -1,6 +1,4 @@
-000B   1 c/aB\
-0010   2 abC
-0040   1 aBC
-00CA   1 C?A:B
-00E0   1 C/ab\
- Gesamt:    6 DS4:     0
+0080   1 ABC
+00B0   3 C/aB\
+00D3   1 BC?1:0:a:1
+ Gesamt:    5 DS4:     1
