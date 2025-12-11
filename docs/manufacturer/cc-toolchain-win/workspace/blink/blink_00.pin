@@ -1,6 +1,11 @@
 # Pinfile for Design blink_00
+<<<<<<< HEAD
 # 2025-08-18 21:57:48
 # Bounding Box for compact mode is (x67y113) - (x70y124)   box size: 48
+=======
+# 2025-08-19 09:42:26
+# Bounding Box for compact mode is (x66y105) - (x72y126)   box size: 154
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
 
 SizeX = 160 | SizeY = 128;
 

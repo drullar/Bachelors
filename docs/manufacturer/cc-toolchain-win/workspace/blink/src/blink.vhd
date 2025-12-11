@@ -17,17 +17,27 @@ architecture Behavioral of blink is
     constant DATA_BYTE      : STD_LOGIC_VECTOR(7 downto 0) := "01010101"; -- Constant data to send (0x55)
     constant DELAY_CYCLES   : integer := CLOCK_FREQ / 10; -- 0.1 second delay between transmissions
     
-    -- States for the state machine
-    type state_type is (IDLE, START_BIT, DATA_BITS, STOP_BIT, DELAY);
-    signal state : state_type := IDLE;
+    -- Constant byte to transmit (0x55 = '01010101' binary)
+    constant TX_DATA     : STD_LOGIC_VECTOR(7 downto 0) := "01010101";
     
-    -- Counters and registers
-    signal baud_counter     : integer range 0 to BAUD_COUNT-1 := 0;
-    signal bit_index        : integer range 0 to 7 := 0;
-    signal delay_counter    : integer range 0 to DELAY_CYCLES-1 := 0;
+    -- 5-second delay counter (10 MHz * 5 sec = 50,000,000 cycles)
+    constant DELAY_CYCLES: integer := 50_000_000;
+    
+    -- Power-on reset duration (100 clock cycles = 10 µs at 10 MHz)
+    constant POR_CYCLES  : integer := 100;
+    
+    -- State machine
+    type state_type is (POWER_ON_RESET, IDLE, DELAY_WAIT, START_BIT, DATA_BITS, STOP_BIT);
+    signal state : state_type := POWER_ON_RESET;
+    
+    -- Counters
+    signal baud_counter : integer range 0 to BAUD_PERIOD-1 := 0;
+    signal bit_counter  : integer range 0 to 7 := 0;
+    signal delay_counter: integer range 0 to DELAY_CYCLES-1 := 0;
+    signal por_counter  : integer range 0 to POR_CYCLES-1 := 0;
     
     -- Data register
-    signal data_reg         : STD_LOGIC_VECTOR(7 downto 0) := DATA_BYTE;
+    signal tx_shift_reg : STD_LOGIC_VECTOR(7 downto 0) := (others => '0');
     
 begin
 

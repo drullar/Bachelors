@@ -1,3 +1,7 @@
 # Clock (100 MHz)
 Net "clk"  Loc = "IO_SB_A8" | SCHMITT_TRIGGER=true;
 Net "tx" Loc = "IO_EB_B0";
+<<<<<<< HEAD
+=======
+Net "tx_active" Loc = "IO_EB_A0";
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3

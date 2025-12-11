@@ -1,4 +1,16 @@
+<<<<<<< HEAD
 0E00  11 cD/ab\
 1C00   1 D(BC?0:1:a:0)
 F0D5   1 AC?d:0:1:/bd\
  Gesamt:   13 DS4:     1
+=======
+000B   1 cd/aB\
+0700   1 cD/AB\
+0E00  26 cD/ab\
+1400   1 D(B^C)a
+5C00   1 D(c?a:B)
+7F00   1 ((/AB\)+c)D
+8FAB   1 AC?/Bd\:1:0:/bD\
+B0BB   1 /aB\(d+C)
+ Gesamt:   33 DS4:     1
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
