@@ -1,7 +1,0 @@
-v 3
-file . "blink.vhd" "20250715085406.000" "20250715115625.221":
-  entity blink at 1( 0) + 0 on 13;
-  architecture rtl of blink at 13( 288) + 0 on 14;
-file . "tb_blink.vhd" "20250715085904.000" "20250715115913.809":
-  entity tb_blink at 1( 0) + 0 on 17;
-  architecture sim of tb_blink at 8( 111) + 0 on 18;

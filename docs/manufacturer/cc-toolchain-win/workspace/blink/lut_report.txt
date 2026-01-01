@@ -1,3 +1,4 @@
+<<<<<<< HEAD
          1  LUT2  4  aB
          2  LUT3  10  abC
          3  LUT3  53  C?b:a
@@ -17,6 +18,45 @@
         17  LUT2  4  aB
         18  LUT4  1000  abCD
         19  LUT2  4  aB
+=======
+         1  LUT4  0E00  cD/ab\
+         2  LUT4  0E00  cD/ab\
+         3  LUT4  0E00  cD/ab\
+         4  LUT4  0E00  cD/ab\
+<<<<<<< HEAD
+         5  LUT3  D3  BC?1:0:a:1
+         6  LUT4  0E00  cD/ab\
+         7  LUT2  6  A^B
+         8  LUT4  0E00  cD/ab\
+         9  LUT3  B0  C/aB\
+        10  LUT4  0E00  cD/ab\
+        11  LUT4  0E00  cD/ab\
+        12  LUT3  B0  C/aB\
+        13  LUT3  B0  C/aB\
+        14  LUT4  0E00  cD/ab\
+        15  LUT4  0E00  cD/ab\
+        16  LUT4  0E00  cD/ab\
+        17  LUT4  1C00  D(BC?0:1:a:0)
+        18  LUT3  80  ABC
+        19  LUT4  F0D5  AC?d:0:1:/bd\
+        20  LUT1   1  a       deleted
+=======
+         5  LUT4  0E00  cD/ab\
+         6  LUT4  0E00  cD/ab\
+         7  LUT2  8  AB
+         8  LUT2  4  aB
+         9  LUT3  FE  /ab\+C
+        10  LUT2  8  AB
+        11  LUT2  8  AB
+        12  LUT4  0E00  cD/ab\
+        13  LUT4  0E00  cD/ab\
+        14  LUT4  8FAB  AC?/Bd\:1:0:/bD\
+        15  LUT4  0E00  cD/ab\
+        16  LUT2  8  AB
+        17  LUT4  7F00  ((/AB\)+c)D
+        18  LUT2  8  AB
+        19  LUT2  8  AB
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
         20  LUT2  4  aB
         21  LUT2  4  aB
         22  LUT4  1001  ab(c^D)
@@ -26,6 +66,7 @@
         26  LUT2  4  aB
         27  LUT2  4  aB
         28  LUT2  4  aB
+<<<<<<< HEAD
         29  LUT4  3500  D(c?b:a)
         30  LUT4  F800  ((AB)+C)D
         31  LUT2  8  AB
@@ -82,3 +123,49 @@
         82  LUT1   1  a       deleted
         83  LUT1   1  a       deleted
         84  LUT1   1  a       deleted
+=======
+        29  LUT2  4  aB
+        30  LUT2  4  aB
+        31  LUT3  F8  (AB)+C
+        32  LUT3  10  abC
+        33  LUT3  40  aBC
+        34  LUT3  F8  (AB)+C
+        35  LUT3  40  aBC
+        36  LUT3  F8  (AB)+C
+        37  LUT3  40  aBC
+        38  LUT4  0E00  cD/ab\
+        39  LUT4  0E00  cD/ab\
+        40  LUT4  0E00  cD/ab\
+        41  LUT4  0E00  cD/ab\
+        42  LUT4  0E00  cD/ab\
+        43  LUT4  0E00  cD/ab\
+        44  LUT4  0E00  cD/ab\
+        45  LUT4  0E00  cD/ab\
+        46  LUT4  0E00  cD/ab\
+        47  LUT4  0E00  cD/ab\
+        48  LUT4  0E00  cD/ab\
+        49  LUT4  0E00  cD/ab\
+        50  LUT4  0E00  cD/ab\
+        51  LUT2  8  AB
+        52  LUT2  8  AB
+        53  LUT2  8  AB
+        54  LUT2  8  AB
+        55  LUT2  8  AB
+        56  LUT2  8  AB
+        57  LUT4  0E00  cD/ab\
+        58  LUT4  0E00  cD/ab\
+        59  LUT2  8  AB
+        60  LUT4  0E00  cD/ab\
+        61  LUT2  8  AB
+        62  LUT3  4F  (aB)+c
+        63  LUT2  B  /aB\
+        64  LUT4  0700  cD/AB\
+        65  LUT4  B0BB  /aB\(d+C)
+        66  LUT3  10  abC
+        67  LUT4  000B  cd/aB\
+        68  LUT3  4B  (aB)^c
+        69  LUT4  5C00  D(c?a:B)
+        70  LUT3  0E  c/ab\
+        71  LUT4  1400  D(B^C)a
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f

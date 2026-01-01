@@ -14,8 +14,8 @@ Importing module CC_PLL.
 
 2. Executing SYNTH_GATEMATE pass.
 
-2.1. Executing Verilog-2005 frontend: C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/cells_sim.v
-Parsing Verilog input from `C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/cells_sim.v' to AST representation.
+2.1. Executing Verilog-2005 frontend: D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/cells_sim.v
+Parsing Verilog input from `D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/cells_sim.v' to AST representation.
 Generating RTLIL representation for module `\CC_IBUF'.
 Generating RTLIL representation for module `\CC_OBUF'.
 Generating RTLIL representation for module `\CC_TOBUF'.
@@ -45,9 +45,14 @@ Generating RTLIL representation for module `\CC_L2T4'.
 Generating RTLIL representation for module `\CC_L2T5'.
 Successfully finished Verilog frontend.
 
+<<<<<<< HEAD
 2.2. Executing Verilog-2005 frontend: C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/cells_bb.v
 Parsing Verilog input from `C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/cells_bb.v' to AST representation.
 Replacing existing blackbox module `\CC_PLL' at C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/cells_bb.v:21.1-37.10.
+=======
+2.2. Executing Verilog-2005 frontend: D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/cells_bb.v
+Parsing Verilog input from `D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/cells_bb.v' to AST representation.
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 Generating RTLIL representation for module `\CC_PLL'.
 Generating RTLIL representation for module `\CC_PLL_ADV'.
 Generating RTLIL representation for module `\CC_SERDES'.
@@ -109,8 +114,17 @@ Optimizing module blink.
 
 2.9. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \blink..
+<<<<<<< HEAD
 Removed 2 unused cells and 11 unused wires.
 <suppressed ~3 debug messages>
+=======
+<<<<<<< HEAD
+Removed 0 unused cells and 5 unused wires.
+=======
+Removed 0 unused cells and 7 unused wires.
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+<suppressed ~1 debug messages>
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.10. Executing CHECK pass (checking for obvious problems).
 Checking module blink...
@@ -132,7 +146,22 @@ Running muxtree optimizer on module \blink..
   Evaluating internal representation of mux trees.
   Analyzing evaluation results.
 Removed 0 multiplexer ports.
+<<<<<<< HEAD
 <suppressed ~6 debug messages>
+=======
+<<<<<<< HEAD
+<suppressed ~5 debug messages>
+
+2.11.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \blink.
+    New ctrl vector for $pmux cell \70: { $auto$ghdl.cc:807:import_module$17 $auto$ghdl.cc:807:import_module$7 $auto$opt_reduce.cc:137:opt_pmux$60 }
+    New ctrl vector for $pmux cell \76: { $auto$ghdl.cc:807:import_module$17 $auto$ghdl.cc:807:import_module$7 }
+    New ctrl vector for $pmux cell \79: $auto$ghdl.cc:807:import_module$1
+  Optimizing cells in module \blink.
+Performed a total of 3 changes.
+=======
+<suppressed ~7 debug messages>
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.11.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
   Optimizing cells in module \blink.
@@ -141,7 +170,12 @@ Removed 0 multiplexer ports.
     New ctrl vector for $pmux cell \93: { $auto$ghdl.cc:807:import_module$41 $auto$ghdl.cc:807:import_module$36 $auto$ghdl.cc:807:import_module$16 }
     New ctrl vector for $pmux cell \94: $auto$ghdl.cc:807:import_module$36
   Optimizing cells in module \blink.
+<<<<<<< HEAD
 Performed a total of 4 changes.
+=======
+Performed a total of 6 changes.
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.11.5. Executing OPT_MERGE pass (detect identical cells).
 Finding identical cells in module `\blink'.
@@ -165,11 +199,29 @@ Running muxtree optimizer on module \blink..
   Evaluating internal representation of mux trees.
   Analyzing evaluation results.
 Removed 0 multiplexer ports.
+<<<<<<< HEAD
 <suppressed ~6 debug messages>
 
 2.11.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
   Optimizing cells in module \blink.
 Performed a total of 0 changes.
+=======
+<<<<<<< HEAD
+<suppressed ~5 debug messages>
+
+2.11.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \blink.
+    New ctrl vector for $pmux cell \75: { $auto$opt_reduce.cc:137:opt_pmux$62 $auto$ghdl.cc:807:import_module$1 }
+=======
+<suppressed ~7 debug messages>
+
+2.11.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \blink.
+    New ctrl vector for $pmux cell \104: { $auto$opt_reduce.cc:137:opt_pmux$66 $auto$ghdl.cc:807:import_module$5 }
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+  Optimizing cells in module \blink.
+Performed a total of 1 changes.
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.11.12. Executing OPT_MERGE pass (detect identical cells).
 Finding identical cells in module `\blink'.
@@ -183,7 +235,41 @@ Finding unused cells or wires in module \blink..
 2.11.15. Executing OPT_EXPR pass (perform const folding).
 Optimizing module blink.
 
+<<<<<<< HEAD
 2.11.16. Finished OPT passes. (There is nothing left to do.)
+=======
+2.11.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.11.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \blink..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<<<<<<< HEAD
+<suppressed ~5 debug messages>
+=======
+<suppressed ~7 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+
+2.11.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \blink.
+Performed a total of 0 changes.
+
+2.11.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\blink'.
+Removed a total of 0 cells.
+
+2.11.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.11.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \blink..
+
+2.11.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module blink.
+
+2.11.23. Finished OPT passes. (There is nothing left to do.)
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.12. Executing FSM pass (extract and optimize FSM).
 
@@ -222,7 +308,15 @@ Running muxtree optimizer on module \blink..
   Evaluating internal representation of mux trees.
   Analyzing evaluation results.
 Removed 0 multiplexer ports.
+<<<<<<< HEAD
 <suppressed ~6 debug messages>
+=======
+<<<<<<< HEAD
+<suppressed ~5 debug messages>
+=======
+<suppressed ~7 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.13.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
   Optimizing cells in module \blink.
@@ -233,12 +327,39 @@ Finding identical cells in module `\blink'.
 Removed a total of 0 cells.
 
 2.13.6. Executing OPT_DFF pass (perform DFF optimizations).
+<<<<<<< HEAD
 Adding EN signal on \113 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$42, Q = \TX_DATA_OUT).
 Adding EN signal on \111 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$54, Q = \current_data_bit).
 Adding EN signal on \110 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$45, Q = \delay_timer).
 Adding SRST signal on \109 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$9, Q = \clk_half_counter, rval = 4'0000).
 Adding EN signal on \108 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$44, Q = \bit_counter).
 Adding EN signal on \107 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$43, Q = \current_state).
+=======
+<<<<<<< HEAD
+Adding EN signal on \92 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$23, Q = \tx).
+Adding EN signal on \91 ($dff) from module blink (D = 8'01010101, Q = \data_reg).
+Adding EN signal on \89 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$26, Q = \bit_index).
+Adding EN signal on \88 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$25, Q = \baud_counter).
+Adding EN signal on \87 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$24, Q = \state).
+Setting constant 1-bit at position 0 on $auto$ff.cc:266:slice$66 ($dffe) from module blink.
+Setting constant 0-bit at position 1 on $auto$ff.cc:266:slice$66 ($dffe) from module blink.
+Setting constant 1-bit at position 2 on $auto$ff.cc:266:slice$66 ($dffe) from module blink.
+Setting constant 0-bit at position 3 on $auto$ff.cc:266:slice$66 ($dffe) from module blink.
+Setting constant 1-bit at position 4 on $auto$ff.cc:266:slice$66 ($dffe) from module blink.
+Setting constant 0-bit at position 5 on $auto$ff.cc:266:slice$66 ($dffe) from module blink.
+Setting constant 1-bit at position 6 on $auto$ff.cc:266:slice$66 ($dffe) from module blink.
+Setting constant 0-bit at position 7 on $auto$ff.cc:266:slice$66 ($dffe) from module blink.
+=======
+Adding EN signal on \127 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$34, Q = \tx).
+Adding EN signal on \126 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$40, Q = \tx_shift_reg).
+Adding EN signal on \125 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$4, Q = \por_counter).
+Adding SRST signal on $auto$ff.cc:266:slice$79 ($dffe) from module blink (D = $auto$ghdl.cc:807:import_module$2 [6:0], Q = \por_counter, rval = 7'0000000).
+Adding EN signal on \124 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$38, Q = \delay_counter).
+Adding EN signal on \123 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$37, Q = \bit_counter).
+Adding EN signal on \122 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$36, Q = \baud_counter).
+Adding EN signal on \121 ($dff) from module blink (D = $auto$ghdl.cc:807:import_module$35, Q = \state).
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.13.7. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \blink..
@@ -247,7 +368,15 @@ Removed 3 unused cells and 3 unused wires.
 
 2.13.8. Executing OPT_EXPR pass (perform const folding).
 Optimizing module blink.
+<<<<<<< HEAD
 <suppressed ~3 debug messages>
+=======
+<<<<<<< HEAD
+<suppressed ~3 debug messages>
+=======
+<suppressed ~5 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.13.9. Rerunning OPT passes. (Maybe there is more to do..)
 
@@ -257,7 +386,15 @@ Running muxtree optimizer on module \blink..
   Evaluating internal representation of mux trees.
   Analyzing evaluation results.
 Removed 0 multiplexer ports.
+<<<<<<< HEAD
 <suppressed ~4 debug messages>
+=======
+<<<<<<< HEAD
+<suppressed ~4 debug messages>
+=======
+<suppressed ~6 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.13.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
   Optimizing cells in module \blink.
@@ -307,6 +444,7 @@ Optimizing module blink.
 2.13.23. Finished OPT passes. (There is nothing left to do.)
 
 2.14. Executing WREDUCE pass (reducing word size of cells).
+<<<<<<< HEAD
 Removed top 3 bits (of 4) from port B of cell blink.\19 ($add).
 Removed top 13 bits (of 20) from port B of cell blink.\23 ($ge).
 Removed top 19 bits (of 20) from port B of cell blink.\26 ($add).
@@ -319,6 +457,73 @@ Removed top 1 bits (of 4) from port B of cell blink.\60 ($lt).
 Removed top 1 bits (of 3) from port B of cell blink.\71 ($eq).
 Removed top 1 bits (of 3) from port B of cell blink.\73 ($eq).
 Removed top 22 bits (of 32) from wire blink.$auto$ghdl.cc:807:import_module$19.
+=======
+<<<<<<< HEAD
+Removed top 1 bits (of 3) from port B of cell blink.$auto$opt_dff.cc:195:make_patterns_logic$73 ($ne).
+Removed top 20 bits (of 32) from port A of cell blink.\13 ($lt).
+Removed top 20 bits (of 32) from port B of cell blink.\13 ($lt).
+Converting cell blink.\13 ($lt) from signed to unsigned.
+Removed top 1 bits (of 12) from port A of cell blink.\13 ($lt).
+Removed top 1 bits (of 12) from port B of cell blink.\13 ($lt).
+Removed top 21 bits (of 32) from port A of cell blink.\16 ($add).
+Removed top 31 bits (of 32) from port B of cell blink.\16 ($add).
+Removed top 21 bits (of 32) from port Y of cell blink.\16 ($add).
+Removed top 2 bits (of 3) from port B of cell blink.\25 ($eq).
+Removed top 28 bits (of 32) from port A of cell blink.\37 ($lt).
+Removed top 28 bits (of 32) from port B of cell blink.\37 ($lt).
+Converting cell blink.\37 ($lt) from signed to unsigned.
+Removed top 1 bits (of 4) from port A of cell blink.\37 ($lt).
+Removed top 1 bits (of 4) from port B of cell blink.\37 ($lt).
+Removed top 29 bits (of 32) from port A of cell blink.\40 ($add).
+Removed top 31 bits (of 32) from port B of cell blink.\40 ($add).
+Removed top 29 bits (of 32) from port Y of cell blink.\40 ($add).
+Removed top 1 bits (of 3) from port B of cell blink.\50 ($eq).
+Removed top 1 bits (of 3) from port B of cell blink.\65 ($eq).
+Removed top 1 bits (of 3) from port B of cell blink.$auto$opt_dff.cc:195:make_patterns_logic$85 ($ne).
+Removed top 29 bits (of 32) from wire blink.$auto$ghdl.cc:807:import_module$11.
+Removed top 21 bits (of 32) from wire blink.$auto$ghdl.cc:807:import_module$19.
+=======
+Removed top 24 bits (of 32) from port A of cell blink.\11 ($lt).
+Removed top 24 bits (of 32) from port B of cell blink.\11 ($lt).
+Converting cell blink.\11 ($lt) from signed to unsigned.
+Removed top 1 bits (of 8) from port A of cell blink.\11 ($lt).
+Removed top 1 bits (of 8) from port B of cell blink.\11 ($lt).
+Removed top 25 bits (of 32) from port A of cell blink.\14 ($add).
+Removed top 31 bits (of 32) from port B of cell blink.\14 ($add).
+Removed top 25 bits (of 32) from port Y of cell blink.\14 ($add).
+Removed top 2 bits (of 3) from port B of cell blink.\23 ($eq).
+Removed top 5 bits (of 32) from port A of cell blink.\26 ($lt).
+Removed top 5 bits (of 32) from port B of cell blink.\26 ($lt).
+Converting cell blink.\26 ($lt) from signed to unsigned.
+Removed top 1 bits (of 27) from port A of cell blink.\26 ($lt).
+Removed top 1 bits (of 27) from port B of cell blink.\26 ($lt).
+Removed top 6 bits (of 32) from port A of cell blink.\29 ($add).
+Removed top 31 bits (of 32) from port B of cell blink.\29 ($add).
+Removed top 6 bits (of 32) from port Y of cell blink.\29 ($add).
+Removed top 1 bits (of 3) from port B of cell blink.\38 ($eq).
+Removed top 20 bits (of 32) from port A of cell blink.\41 ($lt).
+Removed top 20 bits (of 32) from port B of cell blink.\41 ($lt).
+Converting cell blink.\41 ($lt) from signed to unsigned.
+Removed top 1 bits (of 12) from port A of cell blink.\41 ($lt).
+Removed top 1 bits (of 12) from port B of cell blink.\41 ($lt).
+Removed top 21 bits (of 32) from port A of cell blink.\44 ($add).
+Removed top 31 bits (of 32) from port B of cell blink.\44 ($add).
+Removed top 21 bits (of 32) from port Y of cell blink.\44 ($add).
+Removed top 1 bits (of 3) from port B of cell blink.\51 ($eq).
+Removed top 28 bits (of 32) from port A of cell blink.\65 ($lt).
+Removed top 28 bits (of 32) from port B of cell blink.\65 ($lt).
+Converting cell blink.\65 ($lt) from signed to unsigned.
+Removed top 1 bits (of 4) from port A of cell blink.\65 ($lt).
+Removed top 1 bits (of 4) from port B of cell blink.\65 ($lt).
+Removed top 29 bits (of 32) from port A of cell blink.\68 ($add).
+Removed top 31 bits (of 32) from port B of cell blink.\68 ($add).
+Removed top 29 bits (of 32) from port Y of cell blink.\68 ($add).
+Removed top 21 bits (of 32) from wire blink.$auto$ghdl.cc:807:import_module$14.
+Removed top 25 bits (of 32) from wire blink.$auto$ghdl.cc:807:import_module$2.
+Removed top 29 bits (of 32) from wire blink.$auto$ghdl.cc:807:import_module$21.
+Removed top 6 bits (of 32) from wire blink.$auto$ghdl.cc:807:import_module$8.
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.15. Executing PEEPOPT pass (run peephole optimizers).
 
@@ -329,21 +534,37 @@ Removed 0 unused cells and 1 unused wires.
 
 2.17. Executing MUXPACK pass ($mux cell cascades to $pmux).
 Converted 0 (p)mux cells into 0 pmux cells.
+<<<<<<< HEAD
 <suppressed ~9 debug messages>
+=======
+<<<<<<< HEAD
+<suppressed ~10 debug messages>
+=======
+<suppressed ~17 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.18. Executing SHARE pass (SAT-based resource sharing).
 
 2.19. Executing TECHMAP pass (map to technology primitives).
 
-2.19.1. Executing Verilog-2005 frontend: C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/cmp2lut.v
-Parsing Verilog input from `C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/cmp2lut.v' to AST representation.
+2.19.1. Executing Verilog-2005 frontend: D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/cmp2lut.v
+Parsing Verilog input from `D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/cmp2lut.v' to AST representation.
 Generating RTLIL representation for module `\_90_lut_cmp_'.
 Successfully finished Verilog frontend.
 
 2.19.2. Continuing TECHMAP pass.
 Using template $paramod$0922ba22cbed0550a173a5a9e983ce0319f512a3\_90_lut_cmp_ for cells of type $lt.
 No more expansions possible.
+<<<<<<< HEAD
 <suppressed ~62 debug messages>
+=======
+<<<<<<< HEAD
+<suppressed ~62 debug messages>
+=======
+<suppressed ~114 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.20. Executing OPT_EXPR pass (perform const folding).
 Optimizing module blink.
@@ -355,8 +576,8 @@ Removed 0 unused cells and 3 unused wires.
 
 2.22. Executing TECHMAP pass (map to technology primitives).
 
-2.22.1. Executing Verilog-2005 frontend: C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/mul_map.v
-Parsing Verilog input from `C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/mul_map.v' to AST representation.
+2.22.1. Executing Verilog-2005 frontend: D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/mul_map.v
+Parsing Verilog input from `D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/mul_map.v' to AST representation.
 Generating RTLIL representation for module `\$__MULMXN'.
 Successfully finished Verilog frontend.
 
@@ -366,6 +587,7 @@ No more expansions possible.
 
 2.23. Executing ALUMACC pass (create $alu and $macc cells).
 Extracting $alu and $macc cells in module blink:
+<<<<<<< HEAD
   creating $macc model for \19 ($add).
   creating $macc model for \26 ($add).
   creating $macc model for \42 ($sub).
@@ -382,11 +604,52 @@ Extracting $alu and $macc cells in module blink:
   creating $alu cell for \42, \48: $auto$alumacc.cc:495:replace_alu$126
   creating $alu cell for \54: $auto$alumacc.cc:495:replace_alu$131
   created 5 $alu and 0 $macc cells.
+=======
+<<<<<<< HEAD
+  creating $macc model for \16 ($add).
+  creating $macc model for \40 ($add).
+  creating $alu model for $macc \40.
+  creating $alu model for $macc \16.
+  creating $alu model for \13 ($lt): new $alu
+  creating $alu cell for \13: $auto$alumacc.cc:495:replace_alu$98
+  creating $alu cell for \16: $auto$alumacc.cc:495:replace_alu$103
+  creating $alu cell for \40: $auto$alumacc.cc:495:replace_alu$106
+  created 3 $alu and 0 $macc cells.
+=======
+  creating $macc model for \14 ($add).
+  creating $macc model for \29 ($add).
+  creating $macc model for \44 ($add).
+  creating $macc model for \68 ($add).
+  creating $alu model for $macc \68.
+  creating $alu model for $macc \44.
+  creating $alu model for $macc \29.
+  creating $alu model for $macc \14.
+  creating $alu model for \11 ($lt): new $alu
+  creating $alu model for \26 ($lt): new $alu
+  creating $alu model for \41 ($lt): new $alu
+  creating $alu cell for \41: $auto$alumacc.cc:495:replace_alu$119
+  creating $alu cell for \26: $auto$alumacc.cc:495:replace_alu$124
+  creating $alu cell for \11: $auto$alumacc.cc:495:replace_alu$129
+  creating $alu cell for \14: $auto$alumacc.cc:495:replace_alu$134
+  creating $alu cell for \29: $auto$alumacc.cc:495:replace_alu$137
+  creating $alu cell for \44: $auto$alumacc.cc:495:replace_alu$140
+  creating $alu cell for \68: $auto$alumacc.cc:495:replace_alu$143
+  created 7 $alu and 0 $macc cells.
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.24. Executing OPT pass (performing simple optimizations).
 
 2.24.1. Executing OPT_EXPR pass (perform const folding).
 Optimizing module blink.
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<suppressed ~5 debug messages>
+=======
+<suppressed ~11 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.24.2. Executing OPT_MERGE pass (detect identical cells).
 Finding identical cells in module `\blink'.
@@ -412,7 +675,15 @@ Removed a total of 0 cells.
 
 2.24.7. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \blink..
+<<<<<<< HEAD
 Removed 0 unused cells and 2 unused wires.
+=======
+<<<<<<< HEAD
+Removed 0 unused cells and 1 unused wires.
+=======
+Removed 0 unused cells and 3 unused wires.
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 <suppressed ~1 debug messages>
 
 2.24.8. Executing OPT_EXPR pass (perform const folding).
@@ -485,8 +756,8 @@ using FF mapping for memory blink.\114
 
 2.28. Executing TECHMAP pass (map to technology primitives).
 
-2.28.1. Executing Verilog-2005 frontend: C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/brams_map.v
-Parsing Verilog input from `C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/brams_map.v' to AST representation.
+2.28.1. Executing Verilog-2005 frontend: D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/brams_map.v
+Parsing Verilog input from `D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/brams_map.v' to AST representation.
 Generating RTLIL representation for module `\$__CC_BRAM_TDP_'.
 Generating RTLIL representation for module `\$__CC_BRAM_SDP_'.
 Successfully finished Verilog frontend.
@@ -499,13 +770,22 @@ No more expansions possible.
 
 2.29.1. Executing OPT_EXPR pass (perform const folding).
 Optimizing module blink.
+<<<<<<< HEAD
 <suppressed ~12 debug messages>
+=======
+<<<<<<< HEAD
+<suppressed ~10 debug messages>
+=======
+<suppressed ~15 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.29.2. Executing OPT_MERGE pass (detect identical cells).
 Finding identical cells in module `\blink'.
 Removed a total of 0 cells.
 
 2.29.3. Executing OPT_DFF pass (perform DFF optimizations).
+<<<<<<< HEAD
 Adding SRST signal on $auto$ff.cc:266:slice$86 ($dffe) from module blink (D = $auto$ghdl.cc:807:import_module$25, Q = \bit_counter, rval = 10'0000000000).
 Adding SRST signal on $auto$ff.cc:266:slice$70 ($dffe) from module blink (D = $auto$ghdl.cc:807:import_module$33, Q = \TX_DATA_OUT, rval = 1'0).
 
@@ -513,6 +793,26 @@ Adding SRST signal on $auto$ff.cc:266:slice$70 ($dffe) from module blink (D = $a
 Finding unused cells or wires in module \blink..
 Removed 2 unused cells and 17 unused wires.
 <suppressed ~3 debug messages>
+=======
+<<<<<<< HEAD
+Adding SRST signal on $auto$ff.cc:266:slice$78 ($dffe) from module blink (D = $auto$ghdl.cc:807:import_module$19, Q = \baud_counter, rval = 11'00000000000).
+Adding SRST signal on $auto$ff.cc:266:slice$67 ($dffe) from module blink (D = $auto$ghdl.cc:807:import_module$16, Q = \bit_index, rval = 3'000).
+
+2.29.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \blink..
+Removed 7 unused cells and 13 unused wires.
+<suppressed ~8 debug messages>
+=======
+Adding SRST signal on $auto$ff.cc:266:slice$91 ($dffe) from module blink (D = $auto$ghdl.cc:807:import_module$14, Q = \baud_counter, rval = 11'00000000000).
+Adding SRST signal on $auto$ff.cc:266:slice$84 ($dffe) from module blink (D = $auto$ghdl.cc:807:import_module$26, Q = \bit_counter, rval = 3'000).
+Adding SRST signal on $auto$ff.cc:266:slice$81 ($dffe) from module blink (D = $auto$ghdl.cc:807:import_module$8, Q = \delay_counter, rval = 26'00000000000000000000000000).
+
+2.29.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \blink..
+Removed 9 unused cells and 18 unused wires.
+<suppressed ~10 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.29.5. Rerunning OPT passes. (Removed registers in this run.)
 
@@ -557,9 +857,30 @@ Removed 0 multiplexer ports.
 
 2.31.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
   Optimizing cells in module \blink.
+<<<<<<< HEAD
     New ctrl vector for $pmux cell \90: { $auto$ghdl.cc:807:import_module$36 $auto$ghdl.cc:807:import_module$17 $auto$opt_reduce.cc:137:opt_pmux$3224 }
   Optimizing cells in module \blink.
 Performed a total of 1 changes.
+=======
+<<<<<<< HEAD
+    Consolidated identical input bits for $pmux cell \73:
+      Old ports: A=3'000, B=12'000011010001, Y=$auto$ghdl.cc:807:import_module$24
+      New ports: A=2'00, B=8'00111001, Y=$auto$ghdl.cc:807:import_module$24 [1:0]
+      New connections: $auto$ghdl.cc:807:import_module$24 [2] = 1'0
+    New ctrl vector for $pmux cell \73: { $auto$ghdl.cc:807:import_module$17 $auto$ghdl.cc:807:import_module$7 $auto$ghdl.cc:807:import_module$1 }
+  Optimizing cells in module \blink.
+Performed a total of 2 changes.
+=======
+    New input vector for $reduce_or cell $auto$opt_dff.cc:254:combine_resets$160: { $auto$alumacc.cc:512:replace_alu$126 [25] $auto$ghdl.cc:807:import_module$6 $auto$ghdl.cc:807:import_module$5 }
+    New ctrl vector for $pmux cell \102: { $auto$ghdl.cc:807:import_module$28 $auto$ghdl.cc:807:import_module$17 $auto$ghdl.cc:807:import_module$12 $auto$ghdl.cc:807:import_module$6 $auto$opt_reduce.cc:137:opt_pmux$167 }
+    Consolidated identical input bits for $pmux cell \112:
+      Old ports: A={ 1'0 \tx_shift_reg [7:1] }, B=16'0101010100000000, Y=$auto$ghdl.cc:807:import_module$40
+      New ports: A=\tx_shift_reg [7:1], B=14'10101010000000, Y=$auto$ghdl.cc:807:import_module$40 [6:0]
+      New connections: $auto$ghdl.cc:807:import_module$40 [7] = 1'0
+  Optimizing cells in module \blink.
+Performed a total of 3 changes.
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.31.5. Executing OPT_MERGE pass (detect identical cells).
 Finding identical cells in module `\blink'.
@@ -596,6 +917,14 @@ Finding identical cells in module `\blink'.
 Removed a total of 0 cells.
 
 2.31.13. Executing OPT_DFF pass (perform DFF optimizations).
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+Setting constant 0-bit at position 2 on $auto$ff.cc:266:slice$81 ($dffe) from module blink.
+=======
+Setting constant 0-bit at position 7 on $auto$ff.cc:266:slice$70 ($dffe) from module blink.
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.31.14. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \blink..
@@ -604,6 +933,7 @@ Removed 0 unused cells and 9 unused wires.
 
 2.31.15. Executing OPT_EXPR pass (perform const folding).
 Optimizing module blink.
+<suppressed ~1 debug messages>
 
 2.31.16. Rerunning OPT passes. (Maybe there is more to do..)
 
@@ -613,7 +943,15 @@ Running muxtree optimizer on module \blink..
   Evaluating internal representation of mux trees.
   Analyzing evaluation results.
 Removed 0 multiplexer ports.
+<<<<<<< HEAD
 <suppressed ~8 debug messages>
+=======
+<<<<<<< HEAD
+<suppressed ~2 debug messages>
+=======
+<suppressed ~3 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.31.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
   Optimizing cells in module \blink.
@@ -635,8 +973,8 @@ Optimizing module blink.
 
 2.32. Executing TECHMAP pass (map to technology primitives).
 
-2.32.1. Executing Verilog-2005 frontend: C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/techmap.v
-Parsing Verilog input from `C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/techmap.v' to AST representation.
+2.32.1. Executing Verilog-2005 frontend: D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/techmap.v
+Parsing Verilog input from `D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/techmap.v' to AST representation.
 Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
 Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
 Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
@@ -663,8 +1001,8 @@ Generating RTLIL representation for module `\_90_demux'.
 Generating RTLIL representation for module `\_90_lut'.
 Successfully finished Verilog frontend.
 
-2.32.2. Executing Verilog-2005 frontend: C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/arith_map.v
-Parsing Verilog input from `C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/arith_map.v' to AST representation.
+2.32.2. Executing Verilog-2005 frontend: D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/arith_map.v
+Parsing Verilog input from `D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/arith_map.v' to AST representation.
 Generating RTLIL representation for module `\_80_gatemate_alu'.
 Successfully finished Verilog frontend.
 
@@ -683,6 +1021,32 @@ Using extmapper simplemap for cells of type $logic_not.
 Using template $paramod$754650b284649a026620fc6856e5b6886cbfe794\_80_gatemate_alu for cells of type $alu.
 Using extmapper simplemap for cells of type $not.
 Using extmapper simplemap for cells of type $reduce_or.
+<<<<<<< HEAD
+=======
+Using extmapper simplemap for cells of type $dffe.
+Using extmapper simplemap for cells of type $reduce_bool.
+Using extmapper simplemap for cells of type $reduce_and.
+Using extmapper simplemap for cells of type $ne.
+Using template $paramod$103b4016182df467cceab67bcf3e18e6361ec0fd\_80_gatemate_alu for cells of type $alu.
+Using template $paramod$a8151eed7df109f18d5adf1169b40bb7b9e884a8\_80_gatemate_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $logic_not.
+<<<<<<< HEAD
+Using template $paramod$2f5fb04daf2da94d981bf9455fa4454c6ec8b705\_80_gatemate_alu for cells of type $alu.
+Using template $paramod$3ef7d3dd227da7627a99c5e5a6a4deb817573e39\_80_gatemate_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $eq.
+Using extmapper simplemap for cells of type $sdffce.
+Using template $paramod$c5c783b17ab1d780abfad8cfe6563a0a7b47a3b0\_90_pmux for cells of type $pmux.
+Using template $paramod$97565c3687be688407d1272a293bd9d0ae6852dc\_90_pmux for cells of type $pmux.
+Using extmapper simplemap for cells of type $mux.
+Using extmapper simplemap for cells of type $lut.
+Using template $paramod$dbcdc7e8aa1a4080cea2deda6fdc8772064f4d90\_80_gatemate_alu for cells of type $alu.
+=======
+Using extmapper simplemap for cells of type $eq.
+Using template $paramod$dbcdc7e8aa1a4080cea2deda6fdc8772064f4d90\_80_gatemate_alu for cells of type $alu.
+Using template $paramod$2f5fb04daf2da94d981bf9455fa4454c6ec8b705\_80_gatemate_alu for cells of type $alu.
+Using template $paramod$7af98a8d3d01ff58dee4212ab52569c379e064a1\_80_gatemate_alu for cells of type $alu.
+Using template $paramod$3ef7d3dd227da7627a99c5e5a6a4deb817573e39\_80_gatemate_alu for cells of type $alu.
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 Using extmapper simplemap for cells of type $sdffce.
 Using template $paramod$85df5dc01c7df96a7d8e5f1fdf76ce9ac452af63\_90_pmux for cells of type $pmux.
 Using template $paramod$e1288d0841f06aa42a27023fd45c512a560ab9b3\_90_pmux for cells of type $pmux.
@@ -690,28 +1054,70 @@ Using extmapper simplemap for cells of type $dffe.
 Using extmapper simplemap for cells of type $sdff.
 Using template $paramod$417561deeefd22fc5d15cabe1cb863a727c82c48\_80_gatemate_alu for cells of type $alu.
 Using extmapper simplemap for cells of type $lut.
+<<<<<<< HEAD
+=======
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+Using extmapper simplemap for cells of type $xor.
+Using extmapper simplemap for cells of type $mux.
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 Using extmapper simplemap for cells of type $pos.
 Using extmapper simplemap for cells of type $xor.
 No more expansions possible.
+<<<<<<< HEAD
 <suppressed ~344 debug messages>
+=======
+<<<<<<< HEAD
+<suppressed ~213 debug messages>
+=======
+<suppressed ~337 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.33. Executing OPT pass (performing simple optimizations).
 
 2.33.1. Executing OPT_EXPR pass (perform const folding).
 Optimizing module blink.
+<<<<<<< HEAD
 <suppressed ~263 debug messages>
 
 2.33.2. Executing OPT_MERGE pass (detect identical cells).
 Finding identical cells in module `\blink'.
 <suppressed ~138 debug messages>
 Removed a total of 46 cells.
+=======
+<<<<<<< HEAD
+<suppressed ~93 debug messages>
+
+2.33.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\blink'.
+<suppressed ~42 debug messages>
+Removed a total of 14 cells.
+=======
+<suppressed ~311 debug messages>
+
+2.33.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\blink'.
+<suppressed ~99 debug messages>
+Removed a total of 33 cells.
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.33.3. Executing OPT_DFF pass (perform DFF optimizations).
 
 2.33.4. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \blink..
+<<<<<<< HEAD
 Removed 8 unused cells and 219 unused wires.
 <suppressed ~9 debug messages>
+=======
+<<<<<<< HEAD
+Removed 13 unused cells and 118 unused wires.
+<suppressed ~14 debug messages>
+=======
+Removed 48 unused cells and 247 unused wires.
+<suppressed ~49 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.33.5. Finished fast OPT passes.
 
@@ -726,16 +1132,27 @@ Finding unused cells or wires in module \blink..
 
 2.37. Executing TECHMAP pass (map to technology primitives).
 
-2.37.1. Executing Verilog-2005 frontend: C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/reg_map.v
-Parsing Verilog input from `C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/reg_map.v' to AST representation.
+2.37.1. Executing Verilog-2005 frontend: D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/reg_map.v
+Parsing Verilog input from `D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/reg_map.v' to AST representation.
 Generating RTLIL representation for module `\$_DFFE_xxxx_'.
 Generating RTLIL representation for module `\$_DLATCH_xxx_'.
 Successfully finished Verilog frontend.
 
 2.37.2. Continuing TECHMAP pass.
 Using template $paramod$7b2151c3bb8e318976eb0e31a556e245b4d15ccd\$_DFFE_xxxx_ for cells of type $_DFFE_PP0P_.
+<<<<<<< HEAD
 No more expansions possible.
 <suppressed ~78 debug messages>
+=======
+<<<<<<< HEAD
+No more expansions possible.
+<suppressed ~69 debug messages>
+=======
+Using template $paramod$7568817364f19026843565e6b569b5b5a44e561e\$_DFFE_xxxx_ for cells of type $_DFFE_PP0N_.
+No more expansions possible.
+<suppressed ~123 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.38. Executing OPT_EXPR pass (perform const folding).
 Optimizing module blink.
@@ -745,11 +1162,20 @@ Optimizing module blink.
 
 2.40. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \blink..
+<<<<<<< HEAD
 Removed 0 unused cells and 237 unused wires.
+=======
+<<<<<<< HEAD
+Removed 0 unused cells and 102 unused wires.
+=======
+Removed 0 unused cells and 348 unused wires.
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 <suppressed ~1 debug messages>
 
 2.41. Executing MUXCOVER pass (mapping to wider MUXes).
 Covering MUX trees in module blink..
+<<<<<<< HEAD
   Treeifying 97 MUXes:
     Found tree with 33 MUXes at root $\114$rdreg[0]$d.
     Found tree with 3 MUXes at root $techmap105\60.Y.
@@ -814,6 +1240,112 @@ Covering MUX trees in module blink..
     Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$4103.
     Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$4095.
     Finished treeification: Found 62 trees.
+=======
+<<<<<<< HEAD
+  Treeifying 19 MUXes:
+    Found tree with 2 MUXes at root $techmap96\37.Y.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$485.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$487.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$503.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$501.
+    Found tree with 1 MUXes at root \70.Y.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$497.
+    Found tree with 1 MUXes at root \73.Y [0].
+    Found tree with 1 MUXes at root \73.Y [1].
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$483.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$509.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$489.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$491.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$507.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$505.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$499.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$495.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$493.
+    Finished treeification: Found 18 trees.
+  Covering trees:
+    Replaced tree at $techmap96\37.Y: 2 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$485: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$487: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$503: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$501: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at \70.Y: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$497: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at \73.Y [0]: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at \73.Y [1]: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$483: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$509: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$489: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$491: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$507: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$505: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$499: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$495: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+    Replaced tree at $auto$rtlil.cc:2985:MuxGate$493: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
+  Added a total of 0 decoder MUXes.
+<suppressed ~323 debug messages>
+=======
+  Treeifying 60 MUXes:
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1030.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1028.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1026.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1024.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1022.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1020.
+    Found tree with 2 MUXes at root $techmap115\65.Y.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$976.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$978.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$974.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1002.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$980.
+    Found tree with 1 MUXes at root \99.Y.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1000.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1050.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1048.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1046.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1044.
+    Found tree with 1 MUXes at root \102.Y [0].
+    Found tree with 1 MUXes at root \102.Y [1].
+    Found tree with 1 MUXes at root \102.Y [2].
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$994.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1042.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1040.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1038.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1036.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1034.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1032.
+    Found tree with 1 MUXes at root \112.Y [0].
+    Found tree with 1 MUXes at root \112.Y [1].
+    Found tree with 1 MUXes at root \112.Y [2].
+    Found tree with 1 MUXes at root \112.Y [3].
+    Found tree with 1 MUXes at root \112.Y [4].
+    Found tree with 1 MUXes at root \112.Y [5].
+    Found tree with 1 MUXes at root \112.Y [6].
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$990.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$988.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$986.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$984.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1018.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1016.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1014.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1012.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1010.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$982.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1008.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1006.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$1004.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$972.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$966.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$964.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$962.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$960.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$958.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$998.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$996.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$968.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$992.
+    Found tree with 1 MUXes at root $auto$rtlil.cc:2985:MuxGate$970.
+    Finished treeification: Found 59 trees.
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
   Covering trees:
     Replaced tree at $\114$rdreg[0]$d: 18 MUX2, 5 MUX4, 0 MUX8, 0 MUX16
     Replaced tree at $techmap105\60.Y: 3 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
@@ -878,13 +1410,26 @@ Covering MUX trees in module blink..
     Replaced tree at $auto$rtlil.cc:2985:MuxGate$4103: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
     Replaced tree at $auto$rtlil.cc:2985:MuxGate$4095: 1 MUX2, 0 MUX4, 0 MUX8, 0 MUX16
   Added a total of 0 decoder MUXes.
+<<<<<<< HEAD
 <suppressed ~1659 debug messages>
+=======
+<suppressed ~1020 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.42. Executing OPT pass (performing simple optimizations).
 
 2.42.1. Executing OPT_EXPR pass (perform const folding).
 Optimizing module blink.
+<<<<<<< HEAD
 <suppressed ~23 debug messages>
+=======
+<<<<<<< HEAD
+<suppressed ~5 debug messages>
+=======
+<suppressed ~4 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.42.2. Executing OPT_MERGE pass (detect identical cells).
 Finding identical cells in module `\blink'.
@@ -949,8 +1494,8 @@ Optimizing module blink.
 
 2.44. Executing TECHMAP pass (map to technology primitives).
 
-2.44.1. Executing Verilog-2005 frontend: C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/mux_map.v
-Parsing Verilog input from `C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/mux_map.v' to AST representation.
+2.44.1. Executing Verilog-2005 frontend: D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/mux_map.v
+Parsing Verilog input from `D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/mux_map.v' to AST representation.
 Generating RTLIL representation for module `\$_MUX8_'.
 Generating RTLIL representation for module `\$_MUX4_'.
 Successfully finished Verilog frontend.
@@ -963,7 +1508,15 @@ No more expansions possible.
 2.45. Executing ABC pass (technology mapping using ABC).
 
 2.45.1. Extracting gate netlist of module `\blink' to `<abc-temp-dir>/input.blif'..
+<<<<<<< HEAD
 Extracted 228 gates and 309 wires to a netlist network with 79 inputs and 58 outputs.
+=======
+<<<<<<< HEAD
+Extracted 55 gates and 77 wires to a netlist network with 20 inputs and 21 outputs.
+=======
+Extracted 119 gates and 184 wires to a netlist network with 63 inputs and 65 outputs.
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.45.1.1. Executing ABC.
 Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
@@ -985,6 +1538,7 @@ ABC: + if
 ABC: + mfs2 
 ABC: + lutpack -S 1 
 ABC: + dress <abc-temp-dir>/input.blif 
+<<<<<<< HEAD
 ABC: Total number of equiv classes                =      67.
 ABC: Participating nodes from both networks       =     148.
 ABC: Participating nodes from the first network   =      68. (  80.00 % of nodes)
@@ -992,6 +1546,33 @@ ABC: Participating nodes from the second network  =      80. (  94.12 % of nodes
 ABC: Node pairs (any polarity)                    =      68. (  80.00 % of names can be moved)
 ABC: Node pairs (same polarity)                   =      64. (  75.29 % of names can be moved)
 ABC: Total runtime =     0.05 sec
+=======
+<<<<<<< HEAD
+ABC: Total number of equiv classes                =      21.
+ABC: Participating nodes from both networks       =      49.
+ABC: Participating nodes from the first network   =      22. (  95.65 % of nodes)
+ABC: Participating nodes from the second network  =      27. ( 117.39 % of nodes)
+ABC: Node pairs (any polarity)                    =      22. (  95.65 % of names can be moved)
+ABC: Node pairs (same polarity)                   =      21. (  91.30 % of names can be moved)
+ABC: Total runtime =     0.01 sec
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+2.45.1.2. Re-integrating ABC results.
+ABC RESULTS:              $lut cells:       20
+ABC RESULTS:        internal signals:       36
+ABC RESULTS:           input signals:       20
+ABC RESULTS:          output signals:       21
+Removing temp directory.
+Removed 0 unused cells and 70 unused wires.
+=======
+ABC: Total number of equiv classes                =      69.
+ABC: Participating nodes from both networks       =     145.
+ABC: Participating nodes from the first network   =      68. (  94.44 % of nodes)
+ABC: Participating nodes from the second network  =      77. ( 106.94 % of nodes)
+ABC: Node pairs (any polarity)                    =      68. (  94.44 % of names can be moved)
+ABC: Node pairs (same polarity)                   =      66. (  91.67 % of names can be moved)
+ABC: Total runtime =     0.02 sec
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 ABC: + write_blif <abc-temp-dir>/output.blif 
 
 2.45.1.2. Re-integrating ABC results.
@@ -1000,21 +1581,55 @@ ABC RESULTS:        internal signals:      172
 ABC RESULTS:           input signals:       79
 ABC RESULTS:          output signals:       58
 Removing temp directory.
+<<<<<<< HEAD
 Removed 0 unused cells and 249 unused wires.
+=======
+Removed 0 unused cells and 170 unused wires.
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.46. Executing TECHMAP pass (map to technology primitives).
 
-2.46.1. Executing Verilog-2005 frontend: C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/lut_map.v
-Parsing Verilog input from `C:\Users\anton\DOCUME~1\NBU\BACHEL~1\docs\MANUFA~1\CC-TOO~1\bin\yosys\share/gatemate/lut_map.v' to AST representation.
+2.46.1. Executing Verilog-2005 frontend: D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/lut_map.v
+Parsing Verilog input from `D:\Documents\NBU\Bachelors\docs\manufacturer\cc-toolchain-win\bin\yosys\share/gatemate/lut_map.v' to AST representation.
 Generating RTLIL representation for module `\$lut'.
 Successfully finished Verilog frontend.
 
 2.46.2. Continuing TECHMAP pass.
+<<<<<<< HEAD
 Using template $paramod$571404c0889eaf57f492cb5e37f8acb5df5852f9\$lut for cells of type $lut.
 Using template $paramod$272652f6c6fbe9a75eff76e45cc7e2788835518b\$lut for cells of type $lut.
 Using template $paramod$658b9ed803f0d3d335616d3858b53e0a2522f1e8\$lut for cells of type $lut.
 Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10000000 for cells of type $lut.
 Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'0001 for cells of type $lut.
+=======
+<<<<<<< HEAD
+Using template $paramod$c5b694ec89d7629b942ccf6a9be1d39e24f8edec\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10110000 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'0110 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10000000 for cells of type $lut.
+Using template $paramod$7843e8c123bb8acf2cb35298776a29dcf1524827\$lut for cells of type $lut.
+Using template $paramod$ee598ef97846e53ede062d34a0514409b6063d1f\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000001\LUT=2'01 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11010011 for cells of type $lut.
+No more expansions possible.
+<suppressed ~127 debug messages>
+Removed 0 unused cells and 40 unused wires.
+=======
+Using template $paramod$a8b2b0f3a3fd7b01c99e8d61bb72f602bd41af54\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11111110 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00001110 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00010000 for cells of type $lut.
+Using template $paramod$43779580bfffd5d5a9f321249a174febf1dac288\$lut for cells of type $lut.
+Using template $paramod$6b0849254d6c87461fb93e37cc18f089f61eb912\$lut for cells of type $lut.
+Using template $paramod$a2d691ba21e093558f2a36669ee489fbccffbcd3\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01000000 for cells of type $lut.
+Using template $paramod$c5b694ec89d7629b942ccf6a9be1d39e24f8edec\$lut for cells of type $lut.
+Using template $paramod$179512a187da069f3b79ef6612a41e494e7d54b6\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00010100 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'1011 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'0100 for cells of type $lut.
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'1000 for cells of type $lut.
 Using template $paramod$6b0849254d6c87461fb93e37cc18f089f61eb912\$lut for cells of type $lut.
 Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'0100 for cells of type $lut.
@@ -1038,8 +1653,14 @@ Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'111
 Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00011110 for cells of type $lut.
 Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01001111 for cells of type $lut.
 No more expansions possible.
+<<<<<<< HEAD
 <suppressed ~438 debug messages>
 Removed 0 unused cells and 181 unused wires.
+=======
+<suppressed ~347 debug messages>
+Removed 0 unused cells and 145 unused wires.
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.47. Executing CLKBUFMAP pass (inserting clock buffers).
 Inserting CC_BUFG on blink.clk_100m[0].
@@ -1058,25 +1679,62 @@ Removed 0 unused modules.
 
 === blink ===
 
+<<<<<<< HEAD
    Number of wires:                116
    Number of wire bits:            520
    Number of public wires:          44
    Number of public wire bits:     263
+=======
+<<<<<<< HEAD
+   Number of wires:                 48
+   Number of wire bits:            148
+   Number of public wires:          19
+   Number of public wire bits:      62
+=======
+   Number of wires:                117
+   Number of wire bits:            522
+   Number of public wires:          36
+   Number of public wire bits:     192
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
    Number of ports:                  2
    Number of port bits:              2
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
+<<<<<<< HEAD
    Number of cells:                188
      CC_ADDF                        56
+=======
+<<<<<<< HEAD
+   Number of cells:                 61
+     CC_ADDF                        21
+     CC_BUFG                         1
+     CC_DFF                         17
+     CC_IBUF                         1
+     CC_LUT1                         1
+     CC_LUT2                         1
+     CC_LUT3                         5
+     CC_LUT4                        13
+=======
+   Number of cells:                219
+     CC_ADDF                        87
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
      CC_BUFG                         1
      CC_DFF                         39
      CC_IBUF                         1
+<<<<<<< HEAD
      CC_LUT1                         8
      CC_LUT2                        24
      CC_LUT3                        13
      CC_LUT4                        39
      CC_MX4                          5
+=======
+     CC_LUT2                        23
+     CC_LUT3                        15
+     CC_LUT4                        33
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
      CC_OBUF                         1
      CC_PLL                          1
 
@@ -1086,8 +1744,18 @@ Found and reported 0 problems.
 
 2.51. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \blink..
+<<<<<<< HEAD
 Removed 0 unused cells and 32 unused wires.
 <suppressed ~32 debug messages>
+=======
+<<<<<<< HEAD
+Removed 0 unused cells and 12 unused wires.
+<suppressed ~12 debug messages>
+=======
+Removed 0 unused cells and 24 unused wires.
+<suppressed ~24 debug messages>
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 
 2.52. Executing Verilog backend.
 
@@ -1096,6 +1764,14 @@ Removed 0 unused cells and 32 unused wires.
 2.52.2. Executing DEMUXMAP pass.
 Dumping module `\blink'.
 
+<<<<<<< HEAD
 End of script. Logfile hash: a4974a1c5e
+=======
+<<<<<<< HEAD
+End of script. Logfile hash: 5a58a9c4c4
+=======
+End of script. Logfile hash: c79f1c49d5
+>>>>>>> 82836355ab1d0697983ea6d71f68c6eb6a249ee3
+>>>>>>> a753dc6ccd4b120b78ed4b9fe1bdb2b9f9f2631f
 Yosys 0.51 (git sha1 c4b519022, x86_64-w64-mingw32-g++ 13.2.0 -O3)
 Time spent: 1% 25x opt_clean (0 sec), 1% 24x opt_expr (0 sec), ...
