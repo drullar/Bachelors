@@ -1,11 +1,10 @@
-000E   1 c/ab\
-0010   2 abC
-0014   1 (B^C)a
-0018   1 AB?C:0:0:c
-0035   1 c?b:a
-0040   3 aBC
-004B   1 (aB)^c
+0010   4 abC
+001E   1 (ab)^c
+0040   1 aBC
 004F   1 (aB)+c
-00F8   3 (AB)+C
-00FE   1 /ab\+C
- Gesamt:   15 DS4:     1
+0053   1 C?b:a
+0070   1 C/AB\
+0080   2 ABC
+00CA   1 C?A:B
+00F4   1 (aB)+C
+ Gesamt:   13 DS4:     0

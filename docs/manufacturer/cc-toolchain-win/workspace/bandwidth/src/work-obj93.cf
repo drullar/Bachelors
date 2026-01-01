@@ -1,0 +1,7 @@
+v 3
+file . "blink.vhd" "20250921103416.000" "20250921133423.458":
+  entity blink at 1( 0) + 0 on 17;
+  architecture behavioral of blink at 18( 383) + 0 on 18;
+file . "tb_blink.vhd" "20250921101644.000" "20250921133423.460":
+  entity tb_blink at 1( 0) + 0 on 19;
+  architecture sim of tb_blink at 8( 118) + 0 on 20;

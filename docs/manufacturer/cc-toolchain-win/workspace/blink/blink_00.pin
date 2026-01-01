@@ -1,8 +1,8 @@
 # Pinfile for Design blink_00
-# 2025-08-19 09:42:26
-# Bounding Box for compact mode is (x66y105) - (x72y126)   box size: 154
+# 2025-12-26 11:57:13
+# Bounding Box for compact mode is (x65y108) - (x71y126)   box size: 133
 
 SizeX = 160 | SizeY = 128;
 
-Pin_out              "tx"   Loc =   "IO_EB_B0"   Die_Loc = "GPIO_N2_B[0]";  #  preplaced by CCF file
-Pin_in              "clk"   Loc =   "IO_SB_A8"   Die_Loc = "GPIO_W2_A[8]";  #  preplaced by CCF file
+Pin_out     "TX_DATA_OUT"   Loc =   "IO_EB_A0"   Die_Loc = "GPIO_N2_A[0]";  #  preplaced by CCF file
+Pin_in       "CLK_10M_IN"   Loc =   "IO_SB_A8"   Die_Loc = "GPIO_W2_A[8]";  #  preplaced by CCF file

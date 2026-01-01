@@ -1,0 +1,4 @@
+v 3
+file . ".\src\blink.vhd" "20250918211032.000" "20250919215723.989":
+  entity blink at 1( 0) + 0 on 11;
+  architecture behavioral of blink at 18( 383) + 0 on 12;
