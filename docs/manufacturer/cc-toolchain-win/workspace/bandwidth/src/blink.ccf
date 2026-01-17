@@ -1,5 +1,0 @@
-# Clock (100 MHz)
-Net "clk"  Loc = "IO_SB_A8" | SCHMITT_TRIGGER=true;
-Net "tx_data" Loc = "IO_EB_B0";
-Net "rx_data" Loc = "IO_EB_A0";
-Net "uart_tx" Loc = "IO_EB_B1";
