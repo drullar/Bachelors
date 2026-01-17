@@ -1,0 +1,13 @@
+# Ignore VHDL generated files
+**/*_00*
+**/*.net
+**/*.pos
+**/*.prn
+**/*.id
+**/*.pathes
+**/*.refcomp
+**/*.refparam
+**/*.refwire
+**/*lut*.txt
+**/log/*.log
+**/net/*
