@@ -36,6 +36,13 @@ IF ERRORLEVEL 1 CALL :DEFAULT_CASE @REM If label doesn't exist
   start /WAIT /B %OFL% -c dirtyJtag %WORKSPACE_DIR%/%TOP%_00.cfg.bit
   GOTO END_CASE
 
+:CASE_setup
+  echo "Creating new VHDL setup in %WORKSPACE_DIR%..."
+  mkdir "%WORKSPACE_DIR%\src"
+  type nul > "%WORKSPACE_DIR%\src\%TOP%.vhdl"
+  type nul > "%WORKSPACE_DIR%\src\%TOP%.ccf"
+  GOTO END_CASE
+
 :DEFAULT_CASE
   echo "%COMMAND%" is invalid Possible commands are build, upload.
   GOTO END_CASE

@@ -1,0 +1,4 @@
+# Clock (100 MHz)
+Net "CLK_10M_IN"  Loc = "IO_SB_A8" | SCHMITT_TRIGGER=true;
+Net "TX_DATA_OUT" Loc = "IO_EB_A0";
+Net "led" Loc = "IO_EB_B0";
