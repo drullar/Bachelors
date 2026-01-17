@@ -6,9 +6,11 @@ set YOSYS=../bin/yosys/yosys.exe
 set PR=../bin/p_r/p_r.exe
 set OFL=../bin/openFPGALoader/openFPGALoader.exe
 
-:: project name and sources
+:: ARGUMENTS
 set COMMAND=%1
 set TOP=%2
+
+:: project name and sources
 set WORKSPACE_DIR=%TOP%
 set VLOG_SRC=%WORKSPACE_DIR%/src/blink.v
 set VHDL_SRC=%WORKSPACE_DIR%/src/%2.vhd
@@ -39,7 +41,9 @@ IF ERRORLEVEL 1 CALL :DEFAULT_CASE @REM If label doesn't exist
 :CASE_setup
   echo "Creating new VHDL setup in %WORKSPACE_DIR%..."
   mkdir "%WORKSPACE_DIR%\src"
-  type nul > "%WORKSPACE_DIR%\src\%TOP%.vhdl"
+  mkdir "%WORKSPACE_DIR%\log"
+  mkdir "%WORKSPACE_DIR%\net"
+  type nul > "%WORKSPACE_DIR%\src\%TOP%.vhd"
   type nul > "%WORKSPACE_DIR%\src\%TOP%.ccf"
   GOTO END_CASE
 

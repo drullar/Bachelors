@@ -17,7 +17,7 @@ architecture behavioral of blink is
     -- ** VHDL CONSTANTS (Moved from Package) **
     -- Define constants for the Ethernet Frame Data
     -- The frame is structured as: PREAMBLE(7) + SFD(1) + DMAC(6) + SMAC(6) + ETYPE(2) + PAYLOAD(46) + FCS(4) = 72 Bytes
-    
+
     -- 7 bytes Preamble (0x55) + 1 byte SFD (0xD5)
     constant FRAME_HEADER : STD_LOGIC_VECTOR(63 downto 0) := x"55555555555555D5";
     -- 6 bytes Destination MAC (ff:ff:ff:ff:ff:ff)
@@ -28,7 +28,7 @@ architecture behavioral of blink is
     constant ETHER_TYPE   : STD_LOGIC_VECTOR(15 downto 0) := x"0800";
     -- 46 bytes Minimum Padding (all zeros, for empty payload)
     -- CORRECTION: Changed 45 * 8 to 46 * 8 to ensure the FRAME_DATA concatenation is exactly 512 bits.
-    constant PAYLOAD_PAD  : STD_LOGIC_VECTOR(46 * 8 - 1 downto 0) := (others => '0'); 
+    constant PAYLOAD_PAD  : STD_LOGIC_VECTOR(46 * 8 - 1 downto 0) := (others => '0');
     -- 4 bytes Frame Check Sequence (FCS/CRC32) - Placeholder
     constant FCS_PLACEHDR : STD_LOGIC_VECTOR(31 downto 0) := x"C0DEBA5E";
 
@@ -72,7 +72,7 @@ architecture behavioral of blink is
     -- Internal PLL Output Clock (100MHz for state machine and Manchester encoding)
     signal CLK_100M         : STD_LOGIC;
     signal PLL_LOCKED_INT   : STD_LOGIC;
-    
+
     -- State Machine for Frame Generation
     -- S_RESET: Initial power-on/PLL wait.
     -- S_IDLE: Ready to transmit.
@@ -82,19 +82,19 @@ architecture behavioral of blink is
 
     -- Counters
     -- bit_counter counts from 0 to 575 (for 576 total bits)
-    signal bit_counter      : unsigned(9 downto 0) := (others => '0'); 
+    signal bit_counter      : unsigned(9 downto 0) := (others => '0');
     -- clk_half_counter counts 0 to 9 for 10 cycles (100ns) = 1 full data bit period @ 100MHz
     signal clk_half_counter : unsigned(3 downto 0) := (others => '0');
-    
+
     -- Delay Timer for 10ms pause (10ms * 100MHz = 1,000,000 cycles)
     constant DELAY_MAX      : integer := 1_000_000;
-    signal delay_timer      : unsigned(19 downto 0) := (others => '0'); 
-    
+    signal delay_timer      : unsigned(19 downto 0) := (others => '0');
+
     -- Data Registers
     -- The raw data bit being encoded in the current 100ns period
     signal current_data_bit : STD_LOGIC := '0';
     -- Internal TX_EN signal (tracks if a frame is currently being transmitted)
-    signal tx_active        : STD_LOGIC := '0'; 
+    signal tx_active        : STD_LOGIC := '0';
 
 begin
 
@@ -104,10 +104,10 @@ begin
         generic map (
             REF_CLK         => "10.0",
             OUT_CLK         => "100.0",
-            PERF_MD         => "ECONOMY", 
+            PERF_MD         => "ECONOMY",
             LOW_JITTER      => 1,
-            CI_FILTER_CONST => 2,         
-            CP_FILTER_CONST => 4          
+            CI_FILTER_CONST => 2,
+            CP_FILTER_CONST => 4
         )
         port map (
             CLK_REF             => CLK_10M_IN,
@@ -158,7 +158,7 @@ begin
 
                     -- 3a. Read the next raw data bit at the start of a 100ns period (clk_half_counter = 0)
                     if clk_half_counter = 0 then
-                        
+
                         -- The total frame length is 576 bits (72 bytes)
                         current_data_bit <= TOTAL_FRAME_SEQUENCE(TOTAL_BITS - 1 - to_integer(bit_counter));
 
@@ -174,7 +174,7 @@ begin
 
                     -- 3b. Manchester Encoding Logic (Output changes mid-period at clk_half_counter = 5)
                     -- IEEE 802.3 Standard: '0' = Low -> High, '1' = High -> Low
-                    -- 
+                    --
 
                     if clk_half_counter < 5 then -- First 50ns (cycles 0-4)
                         if current_data_bit = '0' then
