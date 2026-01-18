@@ -2,8 +2,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-
-
 -- Entity name requested by user
 entity ethernet is
     port (
@@ -26,7 +24,10 @@ entity ethernet is
     signal FCS : STD_LOGIC_VECTOR(31 downto 0) := x"2934059A"; -- TODO calculate FCS in a separate process
 
     type TRANMISSION_STATE is (IDLE_s, NLP_s, PREAMBLE_s, SFD_s, DEST_MAC_s, SRC_MAC_s, ETHER_TYPE_s, PAYLOAD_s, FCS_s);
-    signal transmissionState : TRANMISSION_STATE := IDLE_s;
+    signal transmissionState : TRANMISSION_STATE := NLP_s;
+
+    type NLP_INTERNAL_STATE is (NLP_TX, NLP_IDLE);
+    signal nlpInternalState : NLP_INTERNAL_STATE := NLP_TX;
 end entity ethernet;
 
 architecture behavioral of ethernet is
@@ -36,48 +37,33 @@ architecture behavioral of ethernet is
     -- NLP const and variables
     constant NLP_TO_SEND : integer := 3;
     constant NLP_POS_LEN : integer := 100; -- 100ns NLP positive pulse length. Should last rougly a 1 CLK period
-    constant NLP_INBETWEEN_INTERVAL : integer := 16_000_000; -- 16 000 000ns =  16ms between each pulse
+    constant NLP_INBETWEEN_INTERVAL : integer := 160_000; -- 16 000ns =  16ms between each pulse
 
     -- Signals for state machine logic
     signal nlp_done : boolean := false;
     signal nlp_tx_transmit : STD_LOGIC := '0';
     signal nlp_tx_en_transmit : STD_LOGIC := '1';
+    signal nlp_idle_counter : unsigned(17 downto 0) := (others => '0');
 
     signal idle_done : boolean := false;
     signal idle_tx_transmit : STD_LOGIC := '0';
     signal idle_tx_en_transmit : STD_LOGIC := '1'; -- TODO verify whether 0 or 1 has to be sent
 begin
 
-    TRANSMIT_NLP : process(clk, transmissionState)
-    -- Interval between NLPs 16ms
-    variable nlp_counter : integer := NLP_INBETWEEN_INTERVAL - 1;
-    variable nlps_sent : integer := 0;
+    TRANSMIT_NLP :process(clk)
     begin
         if rising_edge(clk) then
-            if transmissionState = NLP_s and nlps_sent < NLP_TO_SEND then
-                if nlp_counter = NLP_INBETWEEN_INTERVAL - 1 then
-                    -- transmit positive pulse
-                    nlp_tx_transmit <= '1';
-                    nlp_tx_en_transmit <= '1';
-                    nlp_counter := nlp_counter - 1;
-                    nlps_sent := nlps_sent + 1;
-                else
-                    nlp_tx_transmit <= '0';
-                    nlp_tx_en_transmit <= '1';
-                    nlp_counter := nlp_counter - 1;
-                end if;
-            elsif transmissionState = NLP_s then
-                nlp_done <= true;
+            if nlp_idle_counter = NLP_INBETWEEN_INTERVAL - 1 then
+                nlp_idle_counter <= (others => '0');
             else
-                -- reset variables that keep track
-                nlps_sent := 0;
-                nlp_counter := 15_999_999;
-                nlp_done <= false;
-                nlp_tx_transmit <= '0';
-                nlp_tx_en_transmit <= '1';
+                nlp_idle_counter <= nlp_idle_counter + 1;
             end if;
         end if;
     end process;
+
+    tx      <= '1' when nlp_idle_counter = 0 else '0';
+    tx_en   <= nlp_tx_en_transmit;
+    clk_out <= clk;
 
     TRANSMIT_IDLE : process(clk)
     constant MAX_IDLE : integer := 10_000_000 / 2;
@@ -104,27 +90,27 @@ begin
         end if;
     end process;
 
-    STATE_CONTROL : process(clk)
-    begin
-        case transmissionState is
-            when IDLE_s =>
-                if idle_done then
-                    transmissionState <= NLP_s;
-                    tx <= idle_tx_transmit;
-                    tx_en <= idle_tx_en_transmit;
-                end if;
-            when NLP_s =>
-                if nlp_done then
-                    transmissionState <= IDLE_s; -- TODO change to Preamble_s instead
-                    tx <= nlp_tx_transmit;
-                    tx_en <= nlp_tx_en_transmit;
-                end if;
-            when others =>
-                transmissionState <= IDLE_s;
-                tx <= '0';
-                tx_en <= '1';
-            end case;
-    end process;
+    --STATE_CONTROL : process(clk)
+    --begin
+    --    case transmissionState is
+    --        when IDLE_s =>
+    --            if idle_done then
+    --                transmissionState <= NLP_s;
+    --                tx <= idle_tx_transmit;
+    --                tx_en <= idle_tx_en_transmit;
+    --            end if;
+    --        when NLP_s =>
+    --            if nlp_done then
+    --                transmissionState <= IDLE_s; -- TODO change to Preamble_s instead
+    --                tx <= nlp_tx_transmit;
+    --                tx_en <= nlp_tx_en_transmit;
+    --            end if;
+    --        when others =>
+    --            transmissionState <= IDLE_s;
+    --            tx <= '0';
+    --            tx_en <= '1';
+    --        end case;
+    --end process;
 
     --process (clk, clk_5hz, reset)
     --variable dataIndex : integer range 0 to 15 := 15;
@@ -143,5 +129,5 @@ begin
     --tx_raw <= data_out;
     --tx_encoded <= data_out xor (not clk_5hz);
     --clk_out <= clk_5hz;
-    clk_out <= clk;
+    --clk_out <= clk;
 end architecture behavioral;
