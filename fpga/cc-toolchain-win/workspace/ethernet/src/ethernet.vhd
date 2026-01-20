@@ -66,9 +66,29 @@ architecture behavioral of ethernet is
     signal type_tx : STD_LOGIC := '0';
 
     signal payload_done : boolean := false;
-    signal payload_tx : STD_LOGIc := '0';
+    signal payload_tx : STD_LOGIC := '0';
 
-    signal process_clk : STD_LOGIC := clk; -- Using separate signal definition in order to easily change it with slower clock when needed for testing
+    signal running_fcs : std_logic_vector(31 downto 0) := (others => '1');
+    signal fcs_done : boolean := false;
+    signal fcs_tx : STD_LOGIC := '0';
+    constant HARDCODED_FCS : std_logic_vector(31 downto 0) := x"21444D11";
+
+    signal process_clk : STD_LOGIC := clk;
+
+    function update_crc32(current_crc : std_logic_vector(31 downto 0); --TODO bit by bit
+                          data_byte   : std_logic_vector(7 downto 0))
+                          return std_logic_vector is
+        variable crc : std_logic_vector(31 downto 0) := current_crc;
+    begin
+        for i in 0 to 7 loop
+            if (crc(0) xor data_byte(i)) = '1' then
+                crc := '0' & crc(31 downto 1) xor x"EDB88320"; -- Reflected polynomial
+            else
+                crc := '0' & crc(31 downto 1);
+            end if;
+        end loop;
+        return crc;
+    end function; -- Using separate signal definition in order to easily change it with slower clock when needed for testing
 begin
     process_clk  <= clk;
 
@@ -165,6 +185,7 @@ begin
                 current_byte := DEST_MAC(47 - (byteIndex * 8) downto 40 - (byteIndex * 8));
                 dst_mac_tx <= current_byte(bitIndex);
                 if bitIndex = 7 then
+                    --running_fcs <= update_crc32(running_fcs, current_byte);
                     bitIndex := 0;
                     if byteIndex = 5 then
                         byteIndex := 0;
@@ -179,6 +200,7 @@ begin
                 current_byte := SRC_MAC(47 - (byteIndex * 8) downto 40 - (byteIndex * 8));
                 src_mac_tx <= current_byte(bitIndex);
                 if bitIndex = 7 then
+                    --running_fcs <= update_crc32(running_fcs, current_byte);
                     bitIndex := 0;
                     if byteIndex = 5 then
                         byteIndex := 0;
@@ -210,6 +232,7 @@ begin
                 currentByte := UPPER_LAYER_TYPE(15 - (byteindex * 8) downto 8 - (byteIndex * 8));
                 type_tx <= currentByte(bitIndex);
                 if bitIndex = 7 then
+                    --running_fcs <= update_crc32(running_fcs, currentByte);
                     bitIndex := 0;
                     if byteIndex = 1 then
                         byteIndex := 0;
@@ -240,6 +263,7 @@ begin
                 currentByte := PAYLOAD(367 - (byteIndex * 8) downto 360 - (byteIndex * 8));
                 payload_tx <= currentByte(bitIndex);
                 if bitIndex = 7 then
+                    --running_fcs <= update_crc32(running_fcs, currentByte);
                     bitIndex := 0;
                     if byteIndex = DATA_BYTES - 1 then
                         byteIndex := 0;
@@ -258,6 +282,34 @@ begin
         end if;
     end process;
 
+    TRANSMIT_FCS : process(clk)
+        variable byteIndex : integer range 0 to 3 := 0;
+        variable bitIndex  : integer range 0 to 7 := 0;
+        variable current_byte : std_logic_vector(7 downto 0);
+    begin
+        if rising_edge(clk) then
+            fcs_done <= false;
+            if transmissionState = FCS_s then
+                current_byte := HARDCODED_FCS(31 - (byteIndex * 8) downto 24 - (byteIndex * 8));
+                fcs_tx <= current_byte(bitIndex);
+                if bitIndex = 7 then
+                    bitIndex := 0;
+                    if byteIndex = 3 then
+                        byteIndex := 0;
+                        fcs_done <= true;
+                    else
+                        byteIndex := byteIndex + 1;
+                    end if;
+                else
+                    bitIndex := bitIndex + 1;
+                end if;
+            else
+                byteIndex := 0;
+                bitIndex := 0;
+            end if;
+        end if;
+    end process;
+
     TRANSMIT_IDLE : process(clk)
     constant MAX_IDLE : integer := 10_000_000 / 2;
     variable idleCounter : integer  := 0;
@@ -271,7 +323,7 @@ begin
         end if;
     end process;
 
-    STATE_CONTROL : process(transmissionState, nlp_done, idle_done, preamble_done, sfd_done, dst_mac_done, src_mac_done, type_done, payload_done)
+    STATE_CONTROL : process(transmissionState, nlp_done, idle_done, preamble_done, sfd_done, dst_mac_done, src_mac_done, type_done, payload_done, fcs_done)
     begin
         nextState <= transmissionState;
         case transmissionState is
@@ -304,7 +356,11 @@ begin
                     nextState <= PAYLOAD_s;
                 end if;
             when PAYLOAD_s =>
-                if payload_done  then
+                if payload_done then
+                    nextState <= FCS_s;
+                end if;
+            when FCS_s =>
+                if fcs_done then
                     nextState <= NLP_s;
                 end if;
             when others =>
@@ -312,7 +368,11 @@ begin
             end case;
     end process;
 
-    TX_CONTROL : process(nlp_tx_transmit, nlp_tx_en_transmit, transmissionState, preamble_tx, sfd_tx, dst_mac_tx, src_mac_tx, type_tx, payload_tx)
+    TX_CONTROL : process(
+    nlp_tx_transmit, nlp_tx_en_transmit, transmissionState,
+    preamble_tx, sfd_tx, dst_mac_tx, src_mac_tx, type_tx, payload_tx, fcs_tx
+    )
+    -- TODO consider adding clk to sensitivity list in case it doesn't work without it
     begin
         case transmissionState is
         when NLP_s =>
@@ -336,6 +396,9 @@ begin
             tx_en <= '1';
         when PAYLOAD_s =>
             tx <= payload_tx xor (not clk);
+            tx_en <= '1';
+        when FCS_S =>
+            tx <= fcs_tx xor (not clk);
             tx_en <= '1';
         when others =>
             tx <= '0';
