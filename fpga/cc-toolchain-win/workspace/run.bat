@@ -14,7 +14,7 @@ set TOP=%2
 set WORKSPACE_DIR=%TOP%
 set VLOG_SRC=%WORKSPACE_DIR%/src/blink.v
 set VHDL_SRC=%WORKSPACE_DIR%/src/%2.vhd
-set LOG=0
+set LOG=1 @REM Set to 1 to enable logging output in terminal and to 0 to disable it
 
 :: Place&Route arguments
 set PRFLAGS=-ccf %WORKSPACE_DIR%/src/%TOP%.ccf -cCP
