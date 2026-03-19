@@ -1,0 +1,1 @@
+[19.03.2026] - Managed to make 10Base-T transmission from the FPGA to my laptop. I used the code from https://www.fpga4fun.com/10BASE-T0.html, adjusted to work with the built in PLL in order to get 20Mhz clock. The code is located in ethernet_receive subfolder at the time of comitting this.
