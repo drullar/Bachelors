@@ -58,7 +58,7 @@ architecture Behavioral of ethernet_receive is
     signal clk20             : std_logic;
     signal counter           : unsigned(23 downto 0) := (others => '0');
     signal StartSending      : std_logic := '0';
-    signal rdaddress         : unsigned(7 downto 0) := (others => '0');
+    signal rdaddress         : unsigned(6 downto 0) := (others => '0');
     signal pkt_data          : std_logic_vector(7 downto 0) := (others => '0');
     signal ShiftCount        : unsigned(3 downto 0) := x"F";
     signal SendingPacket     : std_logic := '0';
@@ -72,16 +72,6 @@ architecture Behavioral of ethernet_receive is
     signal idlecount         : unsigned(2 downto 0) := "111";
     signal qo                : std_logic := '1';
     signal qoe               : std_logic := '0';
-    constant DATA_SIZE : integer := 128; -- byte of raw data
-    constant END_OF_DATA : integer := 50 + DATA_SIZE - 1; -- 113 when Data is 64B
-    constant endOfPacket  : integer := END_OF_DATA + 5 ; -- 118 when data is 64B
-    constant HARD_CODED_BASE_IP_LEN : integer := 20;
-    constant HARD_CODED_BASE_UDP_LEN : integer := 8;
-    signal UDP_LEN : std_logic_vector(15 downto 0) := std_logic_vector(
-                                                        to_unsigned(HARD_CODED_BASE_UDP_LEN + DATA_SIZE, 16)
-                                                        );
-    signal IP_LEN : std_logic_vector(15 downto 0) := std_logic_vector(to_unsigned(
-                                    HARD_CODED_BASE_UDP_LEN + DATA_SIZE + HARD_CODED_BASE_IP_LEN, 16));
 
 begin
 
@@ -117,8 +107,6 @@ begin
                 StartSending <= '0';
             end if;
 
-
-
             -- Data ROM Logic
             case v_addr_int is
                 when 0 | 1 | 2 | 3 | 4 | 5 | 6 => pkt_data <= x"55";
@@ -139,8 +127,8 @@ begin
                 when 21     => pkt_data <= x"00";
                 when 22     => pkt_data <= x"45";
                 when 23     => pkt_data <= x"00";
-                when 24     => pkt_data <= IP_LEN(15 downto 8);-- x"00"; -- IP size 1st Byte
-                when 25     => pkt_data <= IP_LEN(7 downto 0); -- std_logic_vector(to_unsigned(46 - 18 + DATA_SIZE, 8));-- x"5C"; -- IP size 2nd Byte
+                when 24     => pkt_data <= x"00";
+                when 25     => pkt_data <= x"2E";
                 when 26     => pkt_data <= x"00";
                 when 27     => pkt_data <= x"00";
                 when 28     => pkt_data <= x"00";
@@ -161,11 +149,11 @@ begin
                 when 43     => pkt_data <= x"00";
                 when 44     => pkt_data <= x"04";
                 when 45     => pkt_data <= x"00";
-                when 46     => pkt_data <= UDP_LEN(15 downto 8);--  x"00"; -- UDP size 1st byte
-                when 47     => pkt_data <= UDP_LEN(7 downto 0);-- std_logic_vector(to_unsigned(8 + DATA_SIZE, 8)); -- UDP size 2nd byte
+                when 46     => pkt_data <= x"00";
+                when 47     => pkt_data <= x"1A";
                 when 48     => pkt_data <= x"00";
                 when 49     => pkt_data <= x"00";
-                when 50 to END_OF_DATA => pkt_data <= std_logic_vector(to_unsigned(v_addr_int - 50, 8));
+                when 50 to 67 => pkt_data <= std_logic_vector(to_unsigned(v_addr_int - 50, 8));
                 when others => pkt_data <= x"00";
             end case;
 
@@ -174,7 +162,7 @@ begin
 
             if StartSending = '1' then
                 SendingPacket <= '1';
-            elsif ShiftCount = 14 and v_addr_int = endOfPacket then
+            elsif ShiftCount = 14 and v_addr_int = 72 then
                 SendingPacket <= '0';
             end if;
 
@@ -209,7 +197,7 @@ begin
 
             if CRCflush = '1' then
                 CRCflush <= SendingPacket;
-            elsif v_readram = '1' and v_addr_int = END_OF_DATA + 1 then
+            elsif v_readram = '1' and v_addr_int = 68 then
                 CRCflush <= '1';
             end if;
 
