@@ -23,7 +23,7 @@ entity ethernet_receive is
         PhysicalAddress_6 : std_logic_vector(7 downto 0) := x"0D"
     );
     port (
-        clk          : in  std_logic; -- 10MHz Input Clock
+        clk20          : in  std_logic; -- 10MHz Input Clock on FPGA | 20Mhz Input clock on Testbench -- TODO revert/comment when switch between FPGA and Testbench
         rst_n        : in  std_logic; -- Active Low Reset
         Ethernet_TDp : out std_logic;
         Ethernet_TDm : out std_logic
@@ -55,7 +55,7 @@ architecture Behavioral of ethernet_receive is
     constant sum3 : unsigned(31 downto 0) := not ((sum2 and x"0000FFFF") + shift_right(sum2, 16));
     constant IPchecksum3 : std_logic_vector(15 downto 0) := std_logic_vector(sum3(15 downto 0));
 
-    signal clk20             : std_logic;
+    -- signal clk20             : std_logic; -- TODO revert/comment when switch between FPGA and Testbench
     signal counter           : unsigned(23 downto 0) := (others => '0');
     signal StartSending      : std_logic := '0';
     signal rdaddress         : unsigned(7 downto 0) := (others => '0');
@@ -86,20 +86,20 @@ architecture Behavioral of ethernet_receive is
 begin
 
     -- PLL Instantiation
-    pll_inst : CC_PLL
-        generic map (
-            REF_CLK => "10.0", OUT_CLK => "20.0", PERF_MD => "ECONOMY",
-            LOW_JITTER => 1, CI_FILTER_CONST => 2, CP_FILTER_CONST => 4
-        )
-        port map (
-            CLK_REF => clk, CLK_FEEDBACK => '0', USR_CLK_REF => '0',
-            USR_LOCKED_STDY_RST => '0', USR_PLL_LOCKED_STDY => open,
-            USR_PLL_LOCKED => open, CLK0 => clk20, CLK90 => open,
-            CLK180 => open, CLK270 => open, CLK_REF_OUT => open
-        );
+    -- pll_inst : CC_PLL -- TODO revert/comment when switch between FPGA and Testbench
+    --     generic map (
+    --         REF_CLK => "10.0", OUT_CLK => "20.0", PERF_MD => "ECONOMY",
+    --         LOW_JITTER => 1, CI_FILTER_CONST => 2, CP_FILTER_CONST => 4
+    --     )
+    --     port map (
+    --         CLK_REF => clk, CLK_FEEDBACK => '0', USR_CLK_REF => '0',
+    --         USR_LOCKED_STDY_RST => '0', USR_PLL_LOCKED_STDY => open,
+    --         USR_PLL_LOCKED => open, CLK0 => clk20, CLK90 => open,
+    --         CLK180 => open, CLK270 => open, CLK_REF_OUT => open
+    --     );
 
     -- Main Process (Synchronous logic only)
-    process(clk20)
+    process(clk20) -- TODO revert/comment when switch between FPGA and Testbench
         -- Variables for local combinational-like logic inside the process
         variable v_readram  : std_logic;
         variable v_CRCinput : std_logic;
@@ -117,8 +117,6 @@ begin
                 StartSending <= '0';
             end if;
 
-
-
             -- Data ROM Logic
             case v_addr_int is
                 when 0 | 1 | 2 | 3 | 4 | 5 | 6 => pkt_data <= x"55";
@@ -135,8 +133,8 @@ begin
                 when 17     => pkt_data <= x"56";
                 when 18     => pkt_data <= x"78";
                 when 19     => pkt_data <= x"90";
-                when 20     => pkt_data <= x"08";
-                when 21     => pkt_data <= x"00";
+                when 20     => pkt_data <= x"08"; -- Ether type / Length 1st Byte
+                when 21     => pkt_data <= x"00"; -- Ether type / Length 2nd Byte
                 when 22     => pkt_data <= x"45";
                 when 23     => pkt_data <= x"00";
                 when 24     => pkt_data <= IP_LEN(15 downto 8);-- x"00"; -- IP size 1st Byte

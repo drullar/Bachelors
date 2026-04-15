@@ -1,0 +1,7 @@
+v 4
+file . "tb_ethernet_receive.vhd" "39d9c7cc5571cfe0f360b184c5ecfa6d9cd48e9e" "20260415205529.595":
+  entity tb_ethernet_receive at 1( 0) + 0 on 33;
+  architecture behavior of tb_ethernet_receive at 8( 142) + 0 on 34;
+file . "ethernet_receive.vhd" "f7a171ca882e20f5078c554cf9c762870f9d0f37" "20260415205526.281":
+  entity ethernet_receive at 1( 0) + 0 on 31;
+  architecture behavioral of ethernet_receive at 33( 1336) + 0 on 32;
