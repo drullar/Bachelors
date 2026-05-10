@@ -25,7 +25,7 @@ architecture behavior of tb_ethernet_receive is
 begin
 
   -- 3. UUT (Entity 1)
-  uut : entity work.ethernet_receive
+  uut : entity work.ethernet_tx
     port map
     (
       clk20        => clk20,

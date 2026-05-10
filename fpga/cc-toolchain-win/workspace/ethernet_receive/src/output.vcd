@@ -11,7 +11,7 @@ $scope module standard $end
 $upscope $end
 $scope module std_logic_1164 $end
 $upscope $end
-$scope module tb_ethernet_receive $end
+$scope module tb_ethernet_tx $end
 $var reg 1 ! tb_clk $end
 $var reg 1 " tb_rst_n $end
 $var reg 1 # tb_tdp $end

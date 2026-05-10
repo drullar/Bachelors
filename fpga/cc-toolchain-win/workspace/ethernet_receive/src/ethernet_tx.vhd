@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 
-entity ethernet_receive is
+entity ethernet_tx is
   generic (
     -- IP source: 192.168.21.12
     IPsource_1 : integer := 192;
@@ -28,9 +28,9 @@ entity ethernet_receive is
     Ethernet_TDp : out std_logic;
     Ethernet_TDm : out std_logic
   );
-end ethernet_receive;
+end ethernet_tx;
 
-architecture Behavioral of ethernet_receive is
+architecture Behavioral of ethernet_tx is
 
   component CC_PLL is
     generic (

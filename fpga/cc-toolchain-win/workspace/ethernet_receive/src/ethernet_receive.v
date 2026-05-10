@@ -1,8 +1,9 @@
 `timescale 1ns / 1ps
 
-module ethernet_receive(
+module ethernet_tx(
     input wire clk,      // 10MHz Input Clock from Oscillator
-    input wire rst_n,    // Active Low Reset
+    inpethernet_tx
+_n,    // Active Low Reset
     output wire Ethernet_TDp,
     output wire Ethernet_TDm
 );
