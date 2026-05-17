@@ -8,6 +8,7 @@ architecture behavior of tb_ethernet_receive is
 
   -- 1. Signals
   signal clk20        : std_logic := '0';
+  signal clk10        : std_logic := '0';
   signal clk48        : std_logic := '0'; -- New 48MHz clock signal
   signal rst_n        : std_logic := '0';
   signal Ethernet_TDp : std_logic;
@@ -18,13 +19,12 @@ architecture behavior of tb_ethernet_receive is
   -- 10 MHz = 100 ns (Wait, your original code said 10MHz but used 50ns for clk20)
   -- If clk20 is 20 MHz: T = 50 ns
   constant clk20_PERIOD : time := 50 ns;
-
+  constant clk10_PERIOD : time := 100 ns;
   -- 48 MHz Calculation: T = 1 / 48,000,000 = 20.8333... ns
   constant clk48_PERIOD : time := 20.833 ns;
 
 begin
 
-  -- 3. UUT (Entity 1)
   uut : entity work.ethernet_tx
     port map
     (
@@ -34,16 +34,25 @@ begin
       Ethernet_TDm => Ethernet_TDm
     );
 
-  -- 4. Monitor (Entity 2) - Now using the 48MHz clock
   u_monitor : entity work.ethernet_rx
     port map
     (
+      clk10              => clk10,
       clk48              => clk48, -- Passing the new clock here
       manchester_data_in => Ethernet_TDp,
       out_EdgeDetected   => TxR
     );
+  clk10_gen : process
+  begin
+    while now < 200 ms loop
+      clk10 <= '0';
+      wait for clk10_PERIOD/2;
+      clk10 <= '1';
+      wait for clk10_PERIOD / 2;
+    end loop;
+    wait;
+  end process;
 
-  -- 5. 20 MHz Clock Process
   clk20_gen : process
   begin
     while now < 200 ms loop

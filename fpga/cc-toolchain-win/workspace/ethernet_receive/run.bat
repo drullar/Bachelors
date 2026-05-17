@@ -6,9 +6,10 @@ set PR=../../bin/p_r/p_r.exe
 set OFL=../../bin/openFPGALoader/openFPGALoader.exe
 
 :: project name and sources
-set TOP=ethernet_tx
+set TOP=ethernet_rx
 set VLOG_SRC=src/ethernet_tx.v
-set VHDL_SRC=src/ethernet_tx.vhd
+:: used design files. The 
+set VHDL_SRC=src/uart_tx.vhd src/ethernet_rx.vhd 
 set LOG=0
 
 :: Place&Route arguments
