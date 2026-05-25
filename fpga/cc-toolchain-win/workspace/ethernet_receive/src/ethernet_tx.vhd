@@ -15,46 +15,21 @@ entity ethernet_tx is
     IPdestination_3 : integer := 21;
     IPdestination_4 : integer := 11;
     -- Physical Address (Dest MAC): 54:E1:AD:1B:10:0D
-      PhysicalAddress_1 : std_logic_vector(7 downto 0) := x"54";
-      PhysicalAddress_2 : std_logic_vector(7 downto 0) := x"E1";
-      PhysicalAddress_3 : std_logic_vector(7 downto 0) := x"AD";
-      PhysicalAddress_4 : std_logic_vector(7 downto 0) := x"1B";
-      PhysicalAddress_5 : std_logic_vector(7 downto 0) := x"10";
-      PhysicalAddress_6 : std_logic_vector(7 downto 0) := x"0D"
+    PhysicalAddress_1 : std_logic_vector(7 downto 0) := x"54";
+    PhysicalAddress_2 : std_logic_vector(7 downto 0) := x"E1";
+    PhysicalAddress_3 : std_logic_vector(7 downto 0) := x"AD";
+    PhysicalAddress_4 : std_logic_vector(7 downto 0) := x"1B";
+    PhysicalAddress_5 : std_logic_vector(7 downto 0) := x"10";
+    PhysicalAddress_6 : std_logic_vector(7 downto 0) := x"0D"
   );
   port (
     clk20        : in std_logic; -- 10MHz Input Clock on FPGA | 20Mhz Input clock on Testbench -- TODO revert/comment when switch between FPGA and Testbench
-    rst_n        : in std_logic; -- Active Low Reset
     Ethernet_TDp : out std_logic;
     Ethernet_TDm : out std_logic
   );
 end ethernet_tx;
 
 architecture Behavioral of ethernet_tx is
-
-  component CC_PLL is
-    generic (
-      REF_CLK         : string;
-      OUT_CLK         : string;
-      PERF_MD         : string;
-      LOW_JITTER      : integer;
-      CI_FILTER_CONST : integer;
-      CP_FILTER_CONST : integer
-    );
-    port (
-      CLK_REF             : in std_logic;
-      CLK_FEEDBACK        : in std_logic;
-      USR_CLK_REF         : in std_logic;
-      USR_LOCKED_STDY_RST : in std_logic;
-      USR_PLL_LOCKED_STDY : out std_logic;
-      USR_PLL_LOCKED      : out std_logic;
-      CLK0                : out std_logic;
-      CLK90               : out std_logic;
-      CLK180              : out std_logic;
-      CLK270              : out std_logic;
-      CLK_REF_OUT         : out std_logic
-    );
-  end component;
 
   -- Pre-calculate Checksum (Static logic)
   constant sum1 : unsigned(31 downto 0) := x"0000C53F" +

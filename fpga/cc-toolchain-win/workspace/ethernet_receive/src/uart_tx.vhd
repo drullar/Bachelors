@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 entity uart_tx is
   generic (
-    CLK_FREQ  : integer := 10_000_000; -- 50 MHz
+    CLK_FREQ  : integer := 10_000_000;
     BAUD_RATE : integer := 115_200 -- Desired Baud Rate
   );
   port (

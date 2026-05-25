@@ -12,7 +12,6 @@ architecture behavior of tb_ethernet_receive is
   signal clk48        : std_logic := '0'; -- New 48MHz clock signal
   signal rst_n        : std_logic := '0';
   signal Ethernet_TDp : std_logic;
-  signal Ethernet_TDm : std_logic;
   signal TxR          : std_logic;
 
   -- 2. Clock Period Definitions
@@ -25,23 +24,19 @@ architecture behavior of tb_ethernet_receive is
 
 begin
 
-  uut : entity work.ethernet_tx
+  ethernet_controller_inst : entity work.ethernet_controller
+    generic map(
+      SIMULATION => true
+    )
     port map
     (
-      clk20        => clk20,
-      rst_n        => rst_n,
-      Ethernet_TDp => Ethernet_TDp,
-      Ethernet_TDm => Ethernet_TDm
+      clk                 => clk10,
+      clk48_sim           => clk48,
+      clk20_sim           => clk20,
+      manchester_data_in  => Ethernet_TDp,
+      manchester_data_out => Ethernet_TDp
     );
 
-  u_monitor : entity work.ethernet_rx
-    port map
-    (
-      clk10              => clk10,
-      clk48              => clk48, -- Passing the new clock here
-      manchester_data_in => Ethernet_TDp,
-      out_EdgeDetected   => TxR
-    );
   clk10_gen : process
   begin
     while now < 200 ms loop

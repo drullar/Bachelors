@@ -1,0 +1,4 @@
+Net   "clk"  Loc = "IO_SB_A8" | SCHMITT_TRIGGER=true;
+Net   "manchester_data_in"  Loc = "IO_EB_A0";
+Net   "manchester_data_out" Loc = "IO_EB_A1";
+Net   "uart_out"  Loc = "IO_EB_B0";
