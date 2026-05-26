@@ -71,19 +71,6 @@ architecture Behavioral of ethernet_tx is
 
 begin
 
-  -- PLL Instantiation
-  -- pll_inst : CC_PLL -- TODO revert/comment when switch between FPGA and Testbench
-  --     generic map (
-  --         REF_CLK => "10.0", OUT_CLK => "20.0", PERF_MD => "ECONOMY",
-  --         LOW_JITTER => 1, CI_FILTER_CONST => 2, CP_FILTER_CONST => 4
-  --     )
-  --     port map (
-  --         CLK_REF => clk, CLK_FEEDBACK => '0', USR_CLK_REF => '0',
-  --         USR_LOCKED_STDY_RST => '0', USR_PLL_LOCKED_STDY => open,
-  --         USR_PLL_LOCKED => open, CLK0 => clk20, CLK90 => open,
-  --         CLK180 => open, CLK270 => open, CLK_REF_OUT => open
-  --     );
-
   -- Main Process (Synchronous logic only)
   process (clk20) -- TODO revert/comment when switch between FPGA and Testbench
     -- Variables for local combinational-like logic inside the process
