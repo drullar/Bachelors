@@ -1,6 +1,7 @@
-Generating gtkwave simulation with testbench:
+Generating gtkwave simulation with testbench commands in order of execution:
 
-ghdl -a ethernet_receive.vhd 
-ghdl -a tb_ethernet_receive.vhd
-ghdl -e tb_ethernet_receive
-ghdl -r tb_ethernet_receive --vcd=wave.vcd
+1a. ghdl -a ethernet_tx.vhd
+1b. ghdl -a ethernet_rx.vhd 
+2. ghdl -a tb_ethernet_receive.vhd
+3. ghdl -e tb_ethernet_receive
+4. ghdl -r tb_ethernet_receive --vcd=wave.vcd
