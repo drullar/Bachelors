@@ -1,12 +1,12 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
-user work.custom_types_pkg.all;
+use work.custom_types_pkg.all;
 
 entity ethernet_rx is
 generic (
-    FPGA_MAC_ADDRESS : std_logic_vector(47 downto 0) = x"00_12_34_56_78_90";
-    ETHER_CONTROLLER_MODE : ether_controller_mode = DEFAULT_CONTROLLER_MODE
+    FPGA_MAC_ADDRESS : std_logic_vector(47 downto 0) := x"00_12_34_56_78_90";
+    ETHER_CONTROLLER_MODE : ether_controller_mode := DEFAULT_CONTROLLER_MODE
   );
   port (
     clk48              : in std_logic;
@@ -16,15 +16,15 @@ generic (
   );
 end ethernet_rx;
 
-type rx_frame_header is (PREAMBLE, SFD, DST_MAC, SRC_MAC, ETHER_TYPE, DATA, INVALID);
 
 architecture Behavioral of ethernet_rx is
-
+  type rx_frame_header is (PREAMBLE, SFD, DST_MAC, SRC_MAC, ETHER_TYPE, DATA, INVALID);
+  
   signal in_data                    : std_logic_vector(2 downto 0) := (others  => '0');
-  signal data_reg                   : std_logic_vector(7 downto 0) := ((others => '0'));
-  signal bits_read                  : std_logic_vector(3 downto 0) := ((others => '0'));
-  signal data_done                  : std_logic_vector(7 downto 0) := ((others => '0'));
-  signal cycles_since_last_read_bit : std_logic_vector(2 downto 0) := ((others => '0')); -- used to ignore mid bit transitions
+  signal data_reg                   : std_logic_vector(7 downto 0) := (others => '0');
+  signal bits_read                  : std_logic_vector(3 downto 0) := (others => '0');
+  signal data_done                  : std_logic_vector(7 downto 0) := (others => '0');
+  signal cycles_since_last_read_bit : std_logic_vector(2 downto 0) := (others => '0'); -- used to ignore mid bit transitions
   signal bytes_read                 : std_logic_vector(9 downto 0) := (others  => '0');
 
   signal current_header             : rx_frame_header              := INVALID;
@@ -94,8 +94,8 @@ begin
                     end if;
                     if (data_reg = x"55") then
                       preamble_bytes <= preamble_bytes + 1;
-                      if (preamble_bits = 6) then
-                        current_header => SFD;
+                      if (preamble_bytes = 6) then
+                        current_header <=SFD;
                       end if;
                     end if;
                   when SFD =>
@@ -105,9 +105,9 @@ begin
                       temp_byte := data_reg;
                     end if;
                     if (data_reg = x"D5") then
-                      current_header => DST_MAC;
+                      current_header <= DST_MAC;
                     else 
-                      current_header => INVALID;
+                      current_header <=INVALID;
                     end if;
                   when DST_MAC =>
                     if (invert_read_bits) then
@@ -115,18 +115,27 @@ begin
                     else
                       temp_byte := data_reg;
                     end if;
-                    frame_dst_mac(47 - 8*dst_mac_bytes * 7 downto 40 - 8*dst_mac_bytes ) <= temp_byte;
+                    case dst_mac_bytes is
+                        when 0 => frame_dst_mac(47 downto 40) <= temp_byte;
+                        when 1 => frame_dst_mac(39 downto 32) <= temp_byte;
+                        when 2 => frame_dst_mac(31 downto 24) <= temp_byte;
+                        when 3 => frame_dst_mac(23 downto 16) <= temp_byte;
+                        when 4 => frame_dst_mac(15 downto  8) <= temp_byte;
+                        when 5 => frame_dst_mac( 7 downto  0) <= temp_byte;
+                        when others => null;
+                    end case;    
                     dst_mac_bytes := dst_mac_bytes + 1;
                     if (dst_mac_bytes = 6) then
                       if (frame_dst_mac = FPGA_MAC_ADDRESS or frame_dst_mac(40) = '1') then -- Check whether the FPGA is destination or the destination is Multicast/Broadcast
-                        current_header => SRC_MAC;
+                        current_header <=SRC_MAC;
                         data_done      <= data_reg; -- Write full read byte
                         data_out_valid <= '1';
                         data_reg       <= in_data(1) & (6 downto 0 => '0'); -- Reset data_reg and write incoming data in
                         bits_read      <= "0001"; -- Set to 1
                         bytes_read     <= std_logic_vector(unsigned(bytes_read) + 1);
                       else 
-                        current_header => INVALID;
+                        current_header <=INVALID;
+                      end if;
                     end if;
                   when others =>
                     data_done      <= data_reg; -- Write full read byte
@@ -159,9 +168,9 @@ begin
         bits_read                  <= (others  => '0');
         cycles_since_last_read_bit <= (others  => '0');
         data_done                  <= (others  => '0');
-        bytes_read                 <= ((others => '0'));
+        bytes_read                 <= (others => '0');
         current_header <= INVALID;
-        frame_dst_mac <= ((others =>'0'));
+        frame_dst_mac <= (others =>'0');
         preamble_bytes <= 0;
         temp_byte := (others => '0');
       end if;
