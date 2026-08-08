@@ -1,8 +1,13 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
+user work.custom_types_pkg.all;
 
 entity ethernet_rx is
+generic (
+    FPGA_MAC_ADDRESS : std_logic_vector(47 downto 0) = x"00_12_34_56_78_90";
+    ETHER_CONTROLLER_MODE : ether_controller_mode = DEFAULT_CONTROLLER_MODE
+  );
   port (
     clk48              : in std_logic;
     manchester_data_in : in std_logic; -- non-inverted signal from transmit circuit
@@ -10,6 +15,8 @@ entity ethernet_rx is
     data_out_valid     : out std_logic
   );
 end ethernet_rx;
+
+type rx_frame_header is (PREAMBLE, SFD, DST_MAC, SRC_MAC, ETHER_TYPE, DATA, INVALID);
 
 architecture Behavioral of ethernet_rx is
 
@@ -19,14 +26,21 @@ architecture Behavioral of ethernet_rx is
   signal data_done                  : std_logic_vector(7 downto 0) := ((others => '0'));
   signal cycles_since_last_read_bit : std_logic_vector(2 downto 0) := ((others => '0')); -- used to ignore mid bit transitions
   signal bytes_read                 : std_logic_vector(9 downto 0) := (others  => '0');
-  signal bit_read_to_reg            : std_logic                    := '0';
+
+  signal current_header             : rx_frame_header              := INVALID;
+  signal invert_read_bits           : boolean                         := false; -- Identify whether the read bits are received in inverted manner
+  signal frame_dst_mac          : std_logic_vector(47 downto 0) := (others => '0');
+  signal preamble_bytes          : integer := 0;
   -- Debug signals
   signal out_bit          : std_logic;
   signal out_EdgeDetected : std_logic;
+  signal bit_read_to_reg            : std_logic                    := '0';
 begin
   process (clk48)
     variable cycles_since_last_edge : integer := 0;
     variable v_edge_detected        : boolean := false;
+    variable temp_byte              : std_logic_vector(7 downto 0) := (others => '0');
+    variable dst_mac_bytes          : integer := 0;
   begin
     if rising_edge(clk48) then
 
@@ -47,15 +61,81 @@ begin
 
         out_EdgeDetected <= '1';
         cycles_since_last_edge := 0;
-
+        
+        -- Initial read of start of frame transmission or allign based on the clock cycles since last bit - used to read the data in the correct state after mancheter edge transition
         if ((bytes_read = "0000000000") or unsigned(cycles_since_last_read_bit) >= 3) then
           -- Bits are added to the registed in this IF 
           if (bits_read = "1000") then
-            data_done      <= data_reg; -- Write full read byte
-            data_out_valid <= '1';
-            data_reg       <= in_data(1) & (6 downto 0 => '0'); -- Reset data_reg and write incoming data in
-            bits_read      <= "0001"; -- Set to 1
-            bytes_read     <= std_logic_vector(unsigned(bytes_read) + 1);
+            case ETHER_CONTROLLER_MODE is
+              when DEBUG =>
+                data_done      <= data_reg; -- Write full read byte
+                data_out_valid <= '1';
+                data_reg       <= in_data(1) & (6 downto 0 => '0'); -- Reset data_reg and write incoming data in
+                bits_read      <= "0001"; -- Set to 1
+                bytes_read     <= std_logic_vector(unsigned(bytes_read) + 1);
+              when NORMAL =>
+                case current_header is
+                  when INVALID =>
+                    if (data_reg = x"AA") then
+                      invert_read_bits <= true;
+                      current_header <= PREAMBLE;
+                      preamble_bytes <= preamble_bytes + 1;
+                    end if;
+                    if (data_reg = x"55") then 
+                      invert_read_bits <= false;
+                      current_header <= PREAMBLE;
+                      preamble_bytes <= preamble_bytes + 1;
+                    end if;
+                  when PREAMBLE =>
+                    if (invert_read_bits) then
+                      temp_byte := not data_reg;
+                    else
+                      temp_byte := data_reg;
+                    end if;
+                    if (data_reg = x"55") then
+                      preamble_bytes <= preamble_bytes + 1;
+                      if (preamble_bits = 6) then
+                        current_header => SFD;
+                      end if;
+                    end if;
+                  when SFD =>
+                    if (invert_read_bits) then
+                      temp_byte := not data_reg;
+                    else
+                      temp_byte := data_reg;
+                    end if;
+                    if (data_reg = x"D5") then
+                      current_header => DST_MAC;
+                    else 
+                      current_header => INVALID;
+                    end if;
+                  when DST_MAC =>
+                    if (invert_read_bits) then
+                      temp_byte := not data_reg;
+                    else
+                      temp_byte := data_reg;
+                    end if;
+                    frame_dst_mac(47 - 8*dst_mac_bytes * 7 downto 40 - 8*dst_mac_bytes ) <= temp_byte;
+                    dst_mac_bytes := dst_mac_bytes + 1;
+                    if (dst_mac_bytes = 6) then
+                      if (frame_dst_mac = FPGA_MAC_ADDRESS or frame_dst_mac(40) = '1') then -- Check whether the FPGA is destination or the destination is Multicast/Broadcast
+                        current_header => SRC_MAC;
+                        data_done      <= data_reg; -- Write full read byte
+                        data_out_valid <= '1';
+                        data_reg       <= in_data(1) & (6 downto 0 => '0'); -- Reset data_reg and write incoming data in
+                        bits_read      <= "0001"; -- Set to 1
+                        bytes_read     <= std_logic_vector(unsigned(bytes_read) + 1);
+                      else 
+                        current_header => INVALID;
+                    end if;
+                  when others =>
+                    data_done      <= data_reg; -- Write full read byte
+                    data_out_valid <= '1';
+                    data_reg       <= in_data(1) & (6 downto 0 => '0'); -- Reset data_reg and write incoming data in
+                    bits_read      <= "0001"; -- Set to 1
+                    bytes_read     <= std_logic_vector(unsigned(bytes_read) + 1);
+                end case;
+            end case;
           else
             data_reg  <= in_data(1) & data_reg(7 downto 1); -- Bitshift right and at new bit as MSBit
             bits_read <= std_logic_vector(unsigned(bits_read) + 1);
@@ -64,6 +144,7 @@ begin
           cycles_since_last_read_bit <= (others => '0');
           out_bit                    <= in_data(1);
         end if;
+      
       else
         bit_read_to_reg  <= '0';
         out_EdgeDetected <= '0';
@@ -79,6 +160,10 @@ begin
         cycles_since_last_read_bit <= (others  => '0');
         data_done                  <= (others  => '0');
         bytes_read                 <= ((others => '0'));
+        current_header <= INVALID;
+        frame_dst_mac <= ((others =>'0'));
+        preamble_bytes <= 0;
+        temp_byte := (others => '0');
       end if;
 
       data_out <= data_done;
