@@ -15,6 +15,7 @@ entity ethernet_tx is
     IPdestination_3 : integer := 21;
     IPdestination_4 : integer := 11;
     -- Physical Address (Dest MAC): 54:E1:AD:1B:10:0D
+    FPGA_MAC_ADDRESS : std_logic_vector(47 downto 0) := x"00_12_34_56_78_90";
     PhysicalAddress_1 : std_logic_vector(7 downto 0) := x"54";
     PhysicalAddress_2 : std_logic_vector(7 downto 0) := x"E1";
     PhysicalAddress_3 : std_logic_vector(7 downto 0) := x"AD";
@@ -100,12 +101,12 @@ begin
         when 11                        => pkt_data                        <= PhysicalAddress_4;
         when 12                        => pkt_data                        <= PhysicalAddress_5;
         when 13                        => pkt_data                        <= PhysicalAddress_6;
-        when 14                        => pkt_data                        <= x"00";
-        when 15                        => pkt_data                        <= x"12";
-        when 16                        => pkt_data                        <= x"34";
-        when 17                        => pkt_data                        <= x"56";
-        when 18                        => pkt_data                        <= x"78";
-        when 19                        => pkt_data                        <= x"90";
+        when 14                        => pkt_data                        <= FPGA_MAC_ADDRESS(47 downto 40);
+        when 15                        => pkt_data                        <= FPGA_MAC_ADDRESS(39 downto 32);
+        when 16                        => pkt_data                        <= FPGA_MAC_ADDRESS(31 downto 24);
+        when 17                        => pkt_data                        <= FPGA_MAC_ADDRESS(23 downto 16);
+        when 18                        => pkt_data                        <= FPGA_MAC_ADDRESS(15 downto 8);
+        when 19                        => pkt_data                        <= FPGA_MAC_ADDRESS(7 downto 0);
         when 20                        => pkt_data                        <= x"08"; -- Ether type / Length 1st Byte
         when 21                        => pkt_data                        <= x"00"; -- Ether type / Length 2nd Byte
         when 22                        => pkt_data                        <= x"45";

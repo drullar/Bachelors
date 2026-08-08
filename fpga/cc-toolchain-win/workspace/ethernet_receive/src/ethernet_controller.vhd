@@ -17,6 +17,8 @@ entity ethernet_controller is
 end ethernet_controller;
 
 architecture Behavioural of ethernet_controller is
+  CONSTANT FPGA_MAC_ADDRESS : std_logic_vector(47 downto 0) := x"00_12_34_56_78_90";
+
   -- Signals part of the design
   signal clk20 : std_logic;
   signal clk48 : std_logic;
@@ -123,6 +125,9 @@ begin
   end generate;
 
   ethernet_rx : entity work.ethernet_rx
+    generic map (
+      FPGA_MAC_ADDRESS => FPGA_MAC_ADDRESS
+  )
     port map
     (
       clk48              => clk48,
