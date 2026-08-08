@@ -125,9 +125,6 @@ begin
   end generate;
 
   ethernet_rx : entity work.ethernet_rx
-    generic map (
-      FPGA_MAC_ADDRESS => FPGA_MAC_ADDRESS
-  )
     port map
     (
       clk48              => clk48,
@@ -137,6 +134,9 @@ begin
     );
 
   ethernet_tx : entity work.ethernet_tx
+  generic map (
+      FPGA_MAC_ADDRESS => FPGA_MAC_ADDRESS
+  )
     port map
     (
       clk20        => clk20,
