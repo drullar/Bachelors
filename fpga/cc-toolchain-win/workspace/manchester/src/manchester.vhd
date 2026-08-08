@@ -40,17 +40,16 @@ begin
     variable dataIndex : integer range 0 to 15 := 15;
     begin
         if rising_edge(clk_5hz) then
-            if reset = '1' then
+            data_out <= DATA(dataIndex);
+            if dataIndex = 0 then
                 dataIndex := 15;
-                data_out <= '0';
             else
-                data_out <= DATA(dataIndex);
                 dataIndex := dataIndex - 1;
             end if;
         end if;
     end process;
     tx_raw <= data_out;
-    tx_encoded <= data_out xor (not clk_5hz);
+    tx_encoded <= data_out;--xor (not clk_5hz);
     clk_out <= clk_5hz;
     --TODO decoding process with separate clock if possible
 end architecture behavioral;

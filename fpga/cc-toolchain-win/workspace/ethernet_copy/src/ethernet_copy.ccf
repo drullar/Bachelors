@@ -1,0 +1,7 @@
+# Clock (100 MHz)
+Net "clk"  Loc = "IO_SB_A8" | SCHMITT_TRIGGER=true;
+Net "tx" Loc = "IO_EB_A0";
+Net "tx2" Loc = "IO_EB_A1";
+Net "clk_out" Loc = "IO_EB_A2";
+Net "tx_raw" Loc = "IO_EB_B0";
+Net "reset" Loc = "IO_EB_B1";

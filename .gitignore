@@ -11,3 +11,4 @@
 **/*lut*.txt
 **/log/*.log
 **/net/*
+**/*vcd

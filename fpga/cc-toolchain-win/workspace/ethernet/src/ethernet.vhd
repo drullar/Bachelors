@@ -2,542 +2,164 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
--- Entity name requested by user
 entity ethernet is
     port (
-        -- System Clock Input (10MHz)
-        clk      : in  STD_LOGIC;                               -- FPGA 10MHz Reference Clock
-        reset    : in STD_LOGIC;
-        clk_out        : out STD_LOGIC;
-        tx             : out STD_LOGIC;
-        tx_en          : out STD_LOGIC; -- Enables the transmission of data via the SN75C1168N chip. '0' should be transmitted when the state is IDLE, in all other cases it should be '1';
-        uart_tx        : out STD_LOGIC
+        clk     : in  STD_LOGIC; -- 10MHz Bit Clock
+        clk_out : out STD_LOGIC;
+        tx      : out STD_LOGIC;
+        tx_en   : out STD_LOGIC
     );
-
-    -- Ethernet Specific Constants
-    constant PREAMBLE_BYTES : integer := 7;
-    constant PREAMBLE_PATTERN : STD_LOGIC_VECTOR(7 downto 0) := "10101010";
-    constant SFD_PATTERN : STD_LOGIC_VECTOR(7 downto 0) := "10101011";
-    constant DEST_MAC : STD_LOGIC_VECTOR(47 downto 0) :=  x"ff_ff_ff_ff_ff_ff";
-    constant SRC_MAC : STD_LOGIC_VECTOR(47 downto 0) := x"10_82_86_18_ea_08"; -- x"00_00_00_00_00_00"; --
-    constant UPPER_LAYER_TYPE : STD_LOGIC_VECTOR(15 downto 0) := x"88b5"; -- x"0000"; -- x"88b5"; -- or length if that is used instead
-    signal PAYLOAD: STD_LOGIC_VECTOR(367 downto 0) := (others => '0'); -- Use minimal size of 46 bytes, i.e 367 bits
-
-    -- signal FCS : STD_LOGIC_VECTOR(31 downto 0) := x"2934059A"; -- TODO calculate FCS in a separate process
-
-    type TRANMISSION_STATE is (IDLE_s, NLP_s, PREAMBLE_s, SFD_s, DEST_MAC_s, SRC_MAC_s, ETHER_TYPE_s, PAYLOAD_s, FCS_s);
-    signal nextState : TRANMISSION_STATE := PREAMBLE_s; -- Can be changed Async
-    signal transmissionState : TRANMISSION_STATE := nextState; -- Can be changed Sync only
-
-    ---- UART Signals
-    signal uart_tx_line : std_logic := '1';
-    signal uart_start   : std_logic := '0'; -- Trigger this when FCS_s is done
-    type UART_STATE_TYPE is (UART_IDLE, UART_START_BIT, UART_DATA, UART_STOP_BIT);
-    signal uart_state : UART_STATE_TYPE := UART_IDLE;
 end entity ethernet;
 
 architecture behavioral of ethernet is
-    constant DATA : STD_LOGIC_VECTOR(15 downto 0) := "1101010101001000";
-    signal data_out: STD_LOGIC;
-    signal clk_5hz: STD_LOGIC;
-    -- NLP const and variables
-    constant NLP_TO_SEND : integer := 3;
-    constant NLP_POS_LEN : integer := 100; -- 100ns NLP positive pulse length. Should last rougly a 1 CLK period
-    constant NLP_INBETWEEN_INTERVAL : integer := 160_000; -- 16 000ns =  16ms between each pulse
 
-    -- Signals for state machine logic
-    signal nlp_done : boolean := false;
-    signal nlp_tx_transmit : STD_LOGIC := '0';
-    signal nlp_tx_en_transmit : STD_LOGIC := '1';
-    signal nlp_idle_counter : unsigned(17 downto 0) := (others => '0');
-    signal nlp_pulses_counter : unsigned (2 downto 0) := (others => '0'); -- Up to decimal 5
+    constant SFD_PATTERN    : std_logic_vector(7 downto 0) := "10101011";
+    constant DEST_MAC       : std_logic_vector(47 downto 0) := x"ffffffffffff";
+    constant SRC_MAC        : std_logic_vector(47 downto 0) := x"10828618ea08";
+    constant ETHER_TYPE     : std_logic_vector(15 downto 0) := x"88b5";
+    constant PAYLOAD_BYTES  : integer := 46;
 
-    signal idle_done : boolean := false;
-    signal idle_tx_transmit : STD_LOGIC := '0';
-    signal idle_tx_en_transmit : STD_LOGIC := '1'; -- TODO verify whether 0 or 1 has to be sent
+    type TRANSMISSION_STATE is (IDLE_s, PREAMBLE_s, SFD_s, DEST_MAC_s, SRC_MAC_s, ETHER_TYPE_s, PAYLOAD_s, FCS_s);
+    signal state : TRANSMISSION_STATE := IDLE_s;
 
-    signal preamble_done : boolean := false;
-    signal preamble_tx : STD_LOGIC := '0';
+    signal bit_cnt      : integer range 0 to 7 := 7;
+    signal byte_cnt     : integer range 0 to 63 := 0;
+    signal idle_cnt     : integer range 0 to 127 := 0;
+    signal fcs_bit_cnt  : integer range 0 to 31 := 0;
 
-    signal sfd_done : boolean := false;
-    signal sfd_tx : STD_LOGIC := '0';
+    signal tx_raw_reg   : std_logic := '0';
+    signal crc_reg      : std_logic_vector(31 downto 0) := (others => '1');
+    signal payload_data : std_logic_vector((PAYLOAD_BYTES * 8) - 1 downto 0) := (others => '0');
 
-    signal dst_mac_done : boolean := false;
-    signal dst_mac_tx : STD_LOGIC := '0';
-    signal calculate_dst_fcs : boolean := false;
-    signal dst_fcs_byte : std_logic_vector(7 downto 0) := (others => '0');
-
-    signal src_mac_done : boolean := false;
-    signal src_mac_tx : STD_LOGIC := '0';
-    signal calculate_src_fcs : boolean := false;
-    signal src_fcs_byte : std_logic_vector(7 downto 0) := (others => '0');
-
-    signal type_done : boolean := false;
-    signal type_tx : STD_LOGIC := '0';
-    signal calculate_type_fcs : boolean := false;
-    signal type_fcs_byte : std_logic_vector(7 downto 0) := (others => '0');
-
-    signal payload_done : boolean := false;
-    signal payload_tx : STD_LOGIC := '0';
-    signal calculate_data_fcs : boolean := false;
-    signal data_fcs_byte : std_logic_vector(7 downto 0) := (others => '0');
-
-    signal running_fcs : std_logic_vector(31 downto 0) := (others => '1');
-    signal fcs_done : boolean := false;
-    signal fcs_tx : STD_LOGIC := '0';
-    constant HARDCODED_FCS : std_logic_vector(31 downto 0) := x"21444D11";
-
-    signal process_clk : STD_LOGIC := clk;
-
-    function update_crc32(current_crc : std_logic_vector(31 downto 0);
-                          data_byte   : std_logic_vector(7 downto 0))
-                          return std_logic_vector is
-        variable crc : std_logic_vector(31 downto 0) := current_crc;
+    function next_crc32_reflected(
+        current_crc : std_logic_vector(31 downto 0);
+        data_bit    : std_logic
+    ) return std_logic_vector is
+        variable new_crc : std_logic_vector(31 downto 0);
+        variable feedback : std_logic;
     begin
-        -- Ethernet standard: Process LSB of the byte first
-        for i in 0 to 7 loop
-            if (crc(0) xor data_byte(i)) = '1' then
-                crc := ("0" & crc(31 downto 1)) xor x"EDB88320";
-            else
-                crc := ("0" & crc(31 downto 1));
-            end if;
-        end loop;
-        return crc;
+        feedback := current_crc(0) xor data_bit;
+        new_crc(30 downto 0) := current_crc(31 downto 1);
+        new_crc(31) := '0';
+        if feedback = '1' then
+            new_crc := new_crc xor x"EDB88320";
+        end if;
+        return new_crc;
     end function;
 
 begin
-    process_clk  <= clk;
 
-    SYNCRONOUS_STATE_CHANGE : process(clk)
-    begin
-        if rising_edge(clk) then
-            transmissionState <= nextState;
-        end if;
-    end process;
-
-    TRANSMIT_NLP :process(clk)
-    variable nlp_counter : integer := 0;
-    constant NLPs_goal : integer := 8;
-    begin
-        if rising_edge(clk) then
-            if transmissionState = NLP_s then
-                nlp_done <= false;
-                if nlp_idle_counter = NLP_INBETWEEN_INTERVAL - 1 then
-                    nlp_idle_counter <= (others => '0');
-                    nlp_tx_transmit <= '1';
-                    nlp_counter := nlp_counter + 1;
-                else
-                    nlp_idle_counter <= nlp_idle_counter + 1;
-                    nlp_tx_transmit <= '0';
-                end if;
-                if nlp_counter = NLPs_goal then
-                    nlp_done <= true;
-                    nlp_counter := 0;
-                end if;
-            end if;
-        end if;
-    end process;
-
-    TRANSMIT_PREAMBLE : process(clk)
-        variable preambleBitIndex     : integer := 7;
-        variable currentPreambleByte  : integer := 1;
-    begin
-        if rising_edge(clk) then
-            -- default: done is a one-cycle pulse
-            preamble_done <= false;
-
-            if transmissionState = PREAMBLE_s then
-                -- drive current bit
-                preamble_tx <= PREAMBLE_PATTERN(preambleBitIndex);
-
-                -- advance bit counter
-                if preambleBitIndex = 0 then
-                    preambleBitIndex := 7;
-
-                    if currentPreambleByte = PREAMBLE_BYTES then
-                        preamble_done <= true;  -- pulse for 1 cycle
-                    else
-                        currentPreambleByte := currentPreambleByte + 1;
-                    end if;
-                else
-                    preambleBitIndex := preambleBitIndex - 1;
-                end if;
-
-            else
-                -- reset when not in PREAMBLE state
-                preambleBitIndex    := 0;
-                currentPreambleByte := 1;
-                preamble_tx         <= '0';
-            end if;
-        end if;
-    end process;
-
-    TRANSMIT_SFD : process(clk)
-    variable sfdBitIndex     : integer := 7;
-    begin
-    if rising_edge(clk) then
-        sfd_done <= false;
-        if transmissionState = SFD_s then
-            sfd_tx <= SFD_PATTERN(sfdBitIndex);
-            if sfdBitIndex = 0 then
-                sfdBitIndex := 7;
-                sfd_done <= true;
-            else
-                sfdBitIndex := sfdBitIndex - 1;
-            end if;
-        end if;
-    end if;
-    end process;
-
-    TRANSMIT_MAC : process(clk)
-    variable byteIndex : integer := 0; -- MSByte
-    variable bitIndex : integer := 0; -- start from LSB. Indexing current byte bits
-    variable current_byte : std_logic_vector(7 downto 0);
-    begin
-        if rising_edge(clk) then
-            src_mac_done <= false;
-            dst_mac_done <= false;
-            if transmissionState = DEST_MAC_s then
-                current_byte := DEST_MAC(47 - (byteIndex * 8) downto 40 - (byteIndex * 8));
-                dst_mac_tx <= current_byte(bitIndex);
-                if bitIndex = 7 then
-                    calculate_dst_fcs <= true;
-                    dst_fcs_byte <= current_byte;
-                    --running_fcs <= update_crc32(running_fcs, current_byte);
-                    bitIndex := 0;
-                    if byteIndex = 5 then
-                        byteIndex := 0;
-                        dst_mac_done <= true;
-                    else
-                        byteIndex := byteIndex + 1;
-                    end if;
-                else
-                    calculate_dst_fcs <= false;
-                    bitIndex := bitIndex + 1;
-                end if;
-           elsif transmissionState = SRC_MAC_s then
-                current_byte := SRC_MAC(47 - (byteIndex * 8) downto 40 - (byteIndex * 8));
-                src_mac_tx <= current_byte(bitIndex);
-                if bitIndex = 7 then
-                    calculate_src_fcs <= true;
-                    src_fcs_byte <= current_byte;
-                    --running_fcs <= update_crc32(running_fcs, current_byte);
-                    bitIndex := 0;
-                    if byteIndex = 5 then
-                        byteIndex := 0;
-                        src_mac_done <= true;
-                    else
-                        byteIndex := byteIndex + 1;
-                    end if;
-                else
-                    calculate_src_fcs <= false;
-                    bitIndex := bitIndex + 1;
-                end if;
-            else
-                -- reset state holders
-                bitIndex := 0;
-                byteIndex := 0;
-                dst_mac_tx <= '0';
-                src_mac_tx <= '0';
-            end if;
-        end if;
-    end process;
-
-    TRANSMIT_ETHER_TYPE : process(clk)
-    variable bitIndex : integer := 0; -- LSB first
-    variable byteIndex : integer := 0; -- MSB first
-    variable current_byte : STD_LOGIC_VECTOR(7 downto 0);
-    begin
-        if rising_edge(clk) then
-            type_done <= false;
-            if transmissionState = ETHER_TYPE_s then
-                current_byte := UPPER_LAYER_TYPE(15 - (byteindex * 8) downto 8 - (byteIndex * 8));
-                type_tx <= current_byte(bitIndex);
-                if bitIndex = 7 then
-                    calculate_type_fcs <= true;
-                    type_fcs_byte <= current_byte;
-                    --running_fcs <= update_crc32(running_fcs, currentByte);
-                    bitIndex := 0;
-                    if byteIndex = 1 then
-                        byteIndex := 0;
-                        type_done <= true;
-                    else
-                        byteIndex := byteIndex + 1;
-                    end if;
-                else
-                    calculate_type_fcs <= false;
-                    bitIndex := bitIndex + 1;
-                end if;
-            else
-                byteIndex := 0;
-                bitIndex := 0;
-                type_tx <= '0';
-            end if;
-        end if;
-    end process;
-
-    TRANSMIT_DATA : process(clk)
-    variable byteIndex : integer := 0;
-    variable bitIndex : integer := 0;
-    constant DATA_BYTES : integer := 46;
-    variable current_byte : STD_LOGIC_VECTOR(7 downto 0);
-    begin
-        if rising_edge(clk) then
-            payload_done <= false;
-            if transmissionState = PAYLOAD_s then
-                current_byte := PAYLOAD(367 - (byteIndex * 8) downto 360 - (byteIndex * 8));
-                payload_tx <= current_byte(bitIndex);
-                if bitIndex = 7 then
-                    data_fcs_byte <= current_byte;
-                    calculate_data_fcs <= true;
-                    --running_fcs <= update_crc32(running_fcs, currentByte);
-                    bitIndex := 0;
-                    if byteIndex = DATA_BYTES - 1 then
-                        byteIndex := 0;
-                        payload_done <= true;
-                    else
-                        byteIndex := byteIndex + 1;
-                    end if;
-                else
-                    calculate_data_fcs <= false;
-                    bitIndex := bitIndex + 1;
-                end if;
-            else
-                bitIndex := 0;
-                byteIndex := 0;
-                payload_tx <= '0';
-            end if;
-        end if;
-    end process;
-
-    TRANSMIT_FCS : process(clk)
-        variable byteIndex : integer range 0 to 3 := 0;
-        variable bitIndex  : integer range 0 to 7 := 0;
+    process(clk)
         variable current_byte : std_logic_vector(7 downto 0);
-        variable final_fcs    : std_logic_vector(31 downto 0);
     begin
         if rising_edge(clk) then
-            fcs_done <= false;
+            case state is
 
-            if transmissionState = FCS_s then
-                -- 1. Flip all bits (Final XOR 0xFFFFFFFF)
-                final_fcs := not running_fcs;
-
-                -- 2. Extract Byte (Big Endian Byte Order: 3, 2, 1, 0)
-                current_byte := final_fcs(31 - (byteIndex * 8) downto 24 - (byteIndex * 8));
-
-                -- 3. Send LSB of the byte first
-                fcs_tx <= current_byte(bitIndex);
-
-                if bitIndex = 7 then
-                    bitIndex := 0;
-                    if byteIndex = 3 then
-                        byteIndex := 0;
-                        fcs_done <= true;
+                when IDLE_s =>
+                    tx_raw_reg <= '0';
+                    fcs_bit_cnt <= 0;
+                    if idle_cnt >= 95 then
+                        state <= PREAMBLE_s;
+                        idle_cnt <= 0;
+                        bit_cnt <= 7;
+                        byte_cnt <= 0;
                     else
-                        byteIndex := byteIndex + 1;
+                        idle_cnt <= idle_cnt + 1;
                     end if;
-                else
-                    bitIndex := bitIndex + 1;
-                end if;
-            else
-                byteIndex := 0;
-                bitIndex  := 0;
-            end if;
-        end if;
-    end process;
 
-    CRC_GEN : process(clk)
-        variable last_bit_sent : std_logic := '0';
-    begin
-        if rising_edge(clk) then
-            -- 1. Reset Logic
-            if transmissionState = PREAMBLE_s then
-                running_fcs <= (others => '1');
+                when PREAMBLE_s =>
+                    -- Fixed syntax: No 'when' allowed here in sequential logic
+                    if (bit_cnt mod 2 /= 0) then
+                        tx_raw_reg <= '1';
+                    else
+                        tx_raw_reg <= '0';
+                    end if;
 
-            -- 2. Calculation Logic
-            -- We trigger ONLY when bitIndex transitions from 7 back to 0
-            -- This happens in all data-carrying states.
-            else
-                case transmissionState is
-                    when DEST_MAC_s | SRC_MAC_s | ETHER_TYPE_s | PAYLOAD_s =>
-                        -- We use the flags you already have to know when a byte is finished
-                        if calculate_dst_fcs or calculate_src_fcs or
-                           calculate_type_fcs or calculate_data_fcs then
+                    if bit_cnt = 0 then
+                        bit_cnt <= 7;
+                        if byte_cnt = 6 then state <= SFD_s; byte_cnt <= 0;
+                        else byte_cnt <= byte_cnt + 1; end if;
+                    else bit_cnt <= bit_cnt - 1; end if;
 
-                            -- CRITICAL: Use the byte signal associated with the flag
-                            if calculate_dst_fcs then
-                                running_fcs <= update_crc32(running_fcs, dst_fcs_byte);
-                            elsif calculate_src_fcs then
-                                running_fcs <= update_crc32(running_fcs, src_fcs_byte);
-                            elsif calculate_type_fcs then
-                                running_fcs <= update_crc32(running_fcs, type_fcs_byte);
-                            elsif calculate_data_fcs then
-                                running_fcs <= update_crc32(running_fcs, data_fcs_byte);
-                            end if;
-                        end if;
-                    when others =>
-                        null;
-                end case;
-            end if;
-        end if;
-    end process;
+                when SFD_s =>
+                    tx_raw_reg <= SFD_PATTERN(bit_cnt);
+                    if bit_cnt = 0 then
+                        state <= DEST_MAC_s;
+                        bit_cnt <= 7;
+                        byte_cnt <= 0;
+                        crc_reg <= (others => '1');
+                    else bit_cnt <= bit_cnt - 1; end if;
 
-    TRANSMIT_IDLE : process(clk)
-    constant MAX_IDLE : integer := 10_000_000 / 2;
-    variable idleCounter : integer  := 0;
-    begin
-        if rising_edge(clk) then
-            if transmissionState = IDLE_S then
-                idle_done <= true;
-            else
-                idle_done <= false;
-            end if;
-        end if;
-    end process;
+                when DEST_MAC_s | SRC_MAC_s =>
+                    if state = DEST_MAC_s then
+                        current_byte := DEST_MAC(47 - (byte_cnt * 8) downto 40 - (byte_cnt * 8));
+                    else
+                        current_byte := SRC_MAC(47 - (byte_cnt * 8) downto 40 - (byte_cnt * 8));
+                    end if;
 
-    STATE_CONTROL : process(transmissionState, nlp_done, idle_done, preamble_done, sfd_done, dst_mac_done, src_mac_done, type_done, payload_done, fcs_done)
-    begin
-        nextState <= transmissionState;
-        case transmissionState is
-            when IDLE_s =>
-                if idle_done then
-                    nextState <= NLP_s;
-                end if;
-            when NLP_s =>
-                if nlp_done then
-                    nextState <= PREAMBLE_s; -- TODO change to Preamble_s instead
-                end if;
-            when PREAMBLE_s =>
-                if preamble_done then
-                    nextState <= SFD_s;
-                end if;
-            when SFD_s =>
-                if sfd_done then
-                    nextState <= DEST_MAC_s;
-                end if;
-            when DEST_MAC_s =>
-                if dst_mac_done then
-                    nextState <= SRC_MAC_s;
-                end if;
-            when SRC_MAC_s =>
-                if src_mac_done then
-                    nextState <= ETHER_TYPE_s;
-                end if;
-            when ETHER_TYPE_s =>
-                if type_done then
-                    nextState <= PAYLOAD_s;
-                end if;
-            when PAYLOAD_s =>
-                if payload_done then
-                    nextState <= FCS_s;
-                end if;
-            when FCS_s =>
-                if fcs_done then
-                    nextState <= NLP_s;
-                end if;
-            when others =>
-                nextState <= NLP_s;
+                    -- Indexing 7-bit_cnt sends LSB (0) first when bit_cnt starts at 7
+                    tx_raw_reg <= current_byte(7 - bit_cnt);
+                    crc_reg <= next_crc32_reflected(crc_reg, current_byte(7 - bit_cnt));
+
+                    if bit_cnt = 0 then
+                        bit_cnt <= 7;
+                        if byte_cnt = 5 then
+                            byte_cnt <= 0;
+                            if state = DEST_MAC_s then state <= SRC_MAC_s; else state <= ETHER_TYPE_s; end if;
+                        else byte_cnt <= byte_cnt + 1; end if;
+                    else bit_cnt <= bit_cnt - 1; end if;
+
+                when ETHER_TYPE_s =>
+                    current_byte := ETHER_TYPE(15 - (byte_cnt * 8) downto 8 - (byte_cnt * 8));
+                    tx_raw_reg <= current_byte(7 - bit_cnt);
+                    crc_reg <= next_crc32_reflected(crc_reg, current_byte(7 - bit_cnt));
+                    if bit_cnt = 0 then
+                        bit_cnt <= 7;
+                        if byte_cnt = 1 then state <= PAYLOAD_s; byte_cnt <= 0;
+                        else byte_cnt <= byte_cnt + 1; end if;
+                    else bit_cnt <= bit_cnt - 1; end if;
+
+                when PAYLOAD_s =>
+                    current_byte := payload_data((PAYLOAD_BYTES*8-1)-(byte_cnt*8) downto (PAYLOAD_BYTES*8-8)-(byte_cnt*8));
+                    tx_raw_reg <= current_byte(7 - bit_cnt);
+                    crc_reg <= next_crc32_reflected(crc_reg, current_byte(7 - bit_cnt));
+                    if bit_cnt = 0 then
+                        bit_cnt <= 7;
+                        if byte_cnt = PAYLOAD_BYTES - 1 then
+                            state <= FCS_s;
+                            byte_cnt <= 0;
+                        else byte_cnt <= byte_cnt + 1; end if;
+                    else bit_cnt <= bit_cnt - 1; end if;
+
+                when FCS_s =>
+                    -- Transmit complemented CRC bit-by-bit
+                    tx_raw_reg <= not crc_reg(fcs_bit_cnt);
+                    if fcs_bit_cnt = 31 then
+                        state <= IDLE_s;
+                        fcs_bit_cnt <= 0;
+                        idle_cnt <= 0;
+                    else
+                        fcs_bit_cnt <= fcs_bit_cnt + 1;
+                    end if;
+
+                when others => state <= IDLE_s;
             end case;
+        end if;
     end process;
 
-    TX_CONTROL : process(
-    nlp_tx_transmit, nlp_tx_en_transmit, transmissionState, clk,
-    preamble_tx, sfd_tx, dst_mac_tx, src_mac_tx, type_tx, payload_tx, fcs_tx
-    )
-    -- TODO consider adding clk to sensitivity list in case it doesn't work without it
+    -- Manchester Output (Registered to prevent glitches)
+    process(clk)
     begin
-        case transmissionState is
-        when NLP_s =>
-            --if nlp_idle_counter = 0 then
-            tx <= nlp_tx_transmit;
-            tx_en   <= nlp_tx_en_transmit;
-        when PREAMBLE_s =>
-            tx <= preamble_tx xor (not clk);
-            tx_en <= '1';
-        when SFD_s =>
-            tx <= sfd_tx xor (not clk);
-            tx_en <= '1';
-        when DEST_MAC_s =>
-            tx <= dst_mac_tx xor (not clk);
-            tx_en <= '1';
-        when SRC_MAC_s =>
-            tx <= src_mac_tx xor (not clk);
-            tx_en <= '1';
-        when ETHER_TYPE_s =>
-            tx <= type_tx xor (not clk);
-            tx_en <= '1';
-        when PAYLOAD_s =>
-            tx <= payload_tx xor (not clk);
-            tx_en <= '1';
-        when FCS_S =>
-            tx <= fcs_tx xor (not clk);
-            tx_en <= '1';
-        when others =>
+        if state = IDLE_s then
             tx <= '0';
-            tx_en <= '1';
-        end case;
-        clk_out <= clk;
-    end process;
-
-    TRANSMIT_UART : process(clk)
-        variable baud_count : integer range 0 to 1042 := 0;
-        variable bit_idx    : integer range 0 to 7 := 0;
-        variable byte_idx   : integer range 0 to 3 := 0;
-        variable current_tx_byte : std_logic_vector(7 downto 0);
-    begin
-        if rising_edge(clk) then
-            case uart_state is
-                when UART_IDLE =>
-                    uart_tx_line <= '1';
-                    baud_count := 0;
-                    -- Trigger UART when Ethernet finishes the FCS state
-                    if fcs_done then
-                        uart_state <= UART_START_BIT;
-                        byte_idx := 0;
-                    end if;
-
-                when UART_START_BIT =>
-                    uart_tx_line <= '0'; -- Start bit is always 0
-                    if baud_count = 1041 then
-                        baud_count := 0;
-                        uart_state <= UART_DATA;
-                        -- Pick the byte to send (MSB first)
-                        current_tx_byte := (not running_fcs(31 - (byte_idx*8) downto 24 - (byte_idx*8)));
-                    else
-                        baud_count := baud_count + 1;
-                    end if;
-
-                when UART_DATA =>
-                    uart_tx_line <= current_tx_byte(bit_idx);
-                    if baud_count = 1041 then
-                        baud_count := 0;
-                        if bit_idx = 7 then
-                            bit_idx := 0;
-                            uart_state <= UART_STOP_BIT;
-                        else
-                            bit_idx := bit_idx + 1;
-                        end if;
-                    else
-                        baud_count := baud_count + 1;
-                    end if;
-
-                when UART_STOP_BIT =>
-                    uart_tx_line <= '1'; -- Stop bit is always 1
-                    if baud_count = 1041 then
-                        baud_count := 0;
-                        if byte_idx = 3 then
-                            uart_state <= UART_IDLE;
-                        else
-                            byte_idx := byte_idx + 1;
-                            uart_state <= UART_START_BIT;
-                        end if;
-                    else
-                        baud_count := baud_count + 1;
-                    end if;
-            end case;
+        else
+            -- Data '1' = Mid-bit Low-to-High transition
+            -- Data '0' = Mid-bit High-to-Low transition
+            tx <= not (tx_raw_reg xor clk);
         end if;
-
-        uart_tx <= uart_tx_line;
     end process;
+
+    tx_en   <= '0' when state = IDLE_s else '1';
+    clk_out <= clk;
+
 end architecture behavioral;

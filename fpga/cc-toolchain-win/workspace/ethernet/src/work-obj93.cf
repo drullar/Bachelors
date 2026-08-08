@@ -1,0 +1,7 @@
+v 3
+file . "tb_ethernet.vhd" "20260317133632.000" "20260317155106.685":
+  entity tb_ethernet at 1( 0) + 0 on 21;
+  architecture sim of tb_ethernet at 7( 85) + 0 on 22;
+file . "ethernet.vhd" "20260317135012.000" "20260317155104.810":
+  entity ethernet at 1( 0) + 0 on 19;
+  architecture behavioral of ethernet at 14( 292) + 0 on 20;
