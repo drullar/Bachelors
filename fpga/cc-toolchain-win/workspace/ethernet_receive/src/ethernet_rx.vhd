@@ -30,24 +30,28 @@ architecture Behavioral of ethernet_rx is
   signal current_header             : rx_frame_header              := INVALID;
   signal invert_read_bits           : boolean                         := false; -- Identify whether the read bits are received in inverted manner
   signal frame_dst_mac          : std_logic_vector(47 downto 0) := (others => '0');
-  signal preamble_bytes          : integer := 0;
   -- Debug signals
   signal out_bit          : std_logic;
   signal out_EdgeDetected : std_logic;
   signal bit_read_to_reg            : std_logic                    := '0';
+  signal header_switch_state_debug        : STD_LOGIC   := '0';
+  signal preamble_byte_debug              : std_logic :='0';
 begin
   process (clk48)
     variable cycles_since_last_edge : integer := 0;
     variable v_edge_detected        : boolean := false;
     variable temp_byte              : std_logic_vector(7 downto 0) := (others => '0');
     variable dst_mac_bytes          : integer := 0;
+    variable preamble_bytes         : integer := 0;
   begin
     if rising_edge(clk48) then
-
+      header_switch_state_debug <= '0';
+      preamble_byte_debug <= '0';
       v_edge_detected := false;
       in_data        <= in_data(1 downto 0) & manchester_data_in;
       out_bit        <= 'Z';
       data_out_valid <= '0';
+      temp_byte := (others => '0');
 
       if ((in_data(2) xor in_data(1)) = '1') then
         v_edge_detected := true;
@@ -76,37 +80,51 @@ begin
               when NORMAL =>
                 case current_header is
                   when INVALID =>
+                    preamble_bytes := 0;
                     if (data_reg = x"AA") then
                       invert_read_bits <= true;
                       current_header <= PREAMBLE;
-                      preamble_bytes <= preamble_bytes + 1;
+                      preamble_bytes := preamble_bytes + 1;
+                      header_switch_state_debug <= '1';
+                      preamble_byte_debug <= '1';
                     end if;
                     if (data_reg = x"55") then 
                       invert_read_bits <= false;
                       current_header <= PREAMBLE;
-                      preamble_bytes <= preamble_bytes + 1;
+                      preamble_bytes := preamble_bytes + 1;
+                      header_switch_state_debug <= '1';
+                      preamble_byte_debug <= '1';
                     end if;
                   when PREAMBLE =>
+                    preamble_bytes := preamble_bytes + 1;
                     if (invert_read_bits) then
                       temp_byte := not data_reg;
                     else
                       temp_byte := data_reg;
                     end if;
-                    if (data_reg = x"55") then
-                      preamble_bytes <= preamble_bytes + 1;
-                      if (preamble_bytes = 6) then
-                        current_header <=SFD;
-                      end if;
+                    if (temp_byte = x"55") then
+                      preamble_byte_debug <= '1';
+                      preamble_bytes := preamble_bytes + 1;
+                    else 
+                      current_header <= INVALID;
+                      header_switch_state_debug <= '1';
                     end if;
+                    if (preamble_bytes = 7) then
+                        current_header <= SFD;
+                        header_switch_state_debug <= '1';
+                        preamble_bytes := 0;
+                      end if;
                   when SFD =>
                     if (invert_read_bits) then
                       temp_byte := not data_reg;
                     else
                       temp_byte := data_reg;
                     end if;
-                    if (data_reg = x"D5") then
+                    if (temp_byte = x"D5") then
+                      header_switch_state_debug <= '1';
                       current_header <= DST_MAC;
                     else 
+                      header_switch_state_debug <= '1';
                       current_header <=INVALID;
                     end if;
                   when DST_MAC =>
@@ -127,11 +145,10 @@ begin
                     dst_mac_bytes := dst_mac_bytes + 1;
                     if (dst_mac_bytes = 6) then
                       if (frame_dst_mac = FPGA_MAC_ADDRESS or frame_dst_mac(40) = '1') then -- Check whether the FPGA is destination or the destination is Multicast/Broadcast
-                        current_header <=SRC_MAC;
+                        header_switch_state_debug <= '1';
+                        current_header <= SRC_MAC;
                         data_done      <= data_reg; -- Write full read byte
                         data_out_valid <= '1';
-                        data_reg       <= in_data(1) & (6 downto 0 => '0'); -- Reset data_reg and write incoming data in
-                        bits_read      <= "0001"; -- Set to 1
                         bytes_read     <= std_logic_vector(unsigned(bytes_read) + 1);
                       else 
                         current_header <=INVALID;
@@ -140,10 +157,11 @@ begin
                   when others =>
                     data_done      <= data_reg; -- Write full read byte
                     data_out_valid <= '1';
-                    data_reg       <= in_data(1) & (6 downto 0 => '0'); -- Reset data_reg and write incoming data in
-                    bits_read      <= "0001"; -- Set to 1
                     bytes_read     <= std_logic_vector(unsigned(bytes_read) + 1);
                 end case;
+
+                data_reg       <= in_data(1) & (6 downto 0 => '0');
+                bits_read      <= "0001"; -- Set to 1
             end case;
           else
             data_reg  <= in_data(1) & data_reg(7 downto 1); -- Bitshift right and at new bit as MSBit
@@ -171,7 +189,7 @@ begin
         bytes_read                 <= (others => '0');
         current_header <= INVALID;
         frame_dst_mac <= (others =>'0');
-        preamble_bytes <= 0;
+        preamble_bytes := 0;
         temp_byte := (others => '0');
       end if;
 

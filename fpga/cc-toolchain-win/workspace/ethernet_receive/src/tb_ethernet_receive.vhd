@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use work.custom_types_pkg.all;
 
 entity tb_ethernet_receive is
 end tb_ethernet_receive;
@@ -26,7 +27,8 @@ begin
 
   ethernet_controller_inst : entity work.ethernet_controller
     generic map(
-      SIMULATION => true
+      SIMULATION => true,
+      ETHER_CONTROLLER_MODE => NORMAL
     )
     port map
     (
@@ -36,6 +38,17 @@ begin
       manchester_data_in  => Ethernet_TDp,
       manchester_data_out => Ethernet_TDp
     );
+
+  ethernet_rx_debug : entity work.ethernet_rx
+  generic map(
+    ETHER_CONTROLLER_MODE => DEBUG
+  )
+  port map(
+    clk48              => clk48,
+    manchester_data_in => Ethernet_TDp, -- non-inverted signal from transmit circuit
+    data_out           => open,
+    data_out_valid     => open
+  );
 
   clk10_gen : process
   begin

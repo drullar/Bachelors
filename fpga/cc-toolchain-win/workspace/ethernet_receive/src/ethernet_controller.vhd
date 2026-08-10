@@ -1,10 +1,12 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
+use work.custom_types_pkg.all;
 
 entity ethernet_controller is
   generic (
-    SIMULATION : boolean := false
+    SIMULATION : boolean := false;
+    ETHER_CONTROLLER_MODE : ether_controller_mode := DEFAULT_CONTROLLER_MODE
   );
   port (
     clk                 : in std_logic; -- 10 Mhz Clock coming from GateMate oscillator
@@ -12,13 +14,14 @@ entity ethernet_controller is
     clk20_sim           : in std_logic;
     manchester_data_in  : in std_logic;
     manchester_data_out : out std_logic;
-    uart_out            : out std_logic
+    uart_out            : out std_logic;
+    power_on_led        : out std_logic
   );
 end ethernet_controller;
 
 architecture Behavioural of ethernet_controller is
   CONSTANT FPGA_MAC_ADDRESS : std_logic_vector(47 downto 0) := x"00_12_34_56_78_90";
-
+  
   -- Signals part of the design
   signal clk20 : std_logic;
   signal clk48 : std_logic;
@@ -125,6 +128,9 @@ begin
   end generate;
 
   ethernet_rx : entity work.ethernet_rx
+    generic map(
+      ETHER_CONTROLLER_MODE => ETHER_CONTROLLER_MODE
+    )
     port map
     (
       clk48              => clk48,
@@ -218,4 +224,6 @@ begin
       end case;
     end if;
   end process;
+
+  power_on_led <= '1';
 end architecture;
