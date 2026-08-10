@@ -1,22 +1,24 @@
 v 3
+file . "ethernet_rx.vhd" "20260810195232.000" "20260810225259.362":
+  entity ethernet_rx at 1( 0) + 0 on 420;
+  architecture behavioral of ethernet_rx at 20( 566) + 0 on 421;
+file . ".\tb_ethernet_receive.vhd" "20260810053916.000" "20260810225327.368":
+  entity tb_ethernet_receive at 1( 0) + 0 on 424;
+  architecture behavior of tb_ethernet_receive at 8( 138) + 0 on 425;
+file . ".\uart_tx.vhd" "20260525110420.000" "20260808234723.943":
+  entity uart_tx at 1( 0) + 0 on 332;
+  architecture rtl of uart_tx at 20( 448) + 0 on 333;
+file . ".\custom_types_pkg.vhd" "20260808202446.000" "20260808234709.683":
+  package custom_types_pkg at 1( 0) + 0 on 329;
 file . ".\cc_fifo_40k_sim.vhd" "20260530081122.000" "20260530111125.583":
   entity cc_fifo_40k at 1( 0) + 0 on 325;
   architecture behavioral of cc_fifo_40k at 25( 643) + 0 on 326;
-file . "ethernet_controller.vhd" "20260526175148.000" "20260530110747.814":
-  entity ethernet_controller at 1( 0) + 0 on 317;
-  architecture behavioural of ethernet_controller at 19( 498) + 0 on 318;
-file . "ethernet_rx.vhd" "20260525123022.000" "20260530110730.447":
-  entity ethernet_rx at 1( 0) + 0 on 313;
-  architecture behavioral of ethernet_rx at 14( 358) + 0 on 314;
-file . "uart_tx.vhd" "20260525110420.000" "20260530110736.054":
-  entity uart_tx at 1( 0) + 0 on 315;
-  architecture rtl of uart_tx at 20( 448) + 0 on 316;
-file . "ethernet_tx.vhd" "20260525203812.000" "20260530110724.960":
-  entity ethernet_tx at 1( 0) + 0 on 311;
-  architecture behavioral of ethernet_tx at 32( 1176) + 0 on 312;
 file . "tb_ethernet_tx.vhd" "20260510203720.000" "20260510235830.715":
   entity tb_ethernet_tx at 1( 0) + 0 on 275;
   architecture behavior of tb_ethernet_tx at 7( 106) + 0 on 276;
-file . "tb_ethernet_receive.vhd" "20260525130454.000" "20260530110802.518":
-  entity tb_ethernet_receive at 1( 0) + 0 on 319;
-  architecture behavior of tb_ethernet_receive at 7( 106) + 0 on 320;
+file . ".\ethernet_tx.vhd" "20260809204122.000" "20260810074947.446":
+  entity ethernet_tx at 1( 0) + 0 on 366;
+  architecture behavioral of ethernet_tx at 28( 957) + 0 on 367;
+file . ".\ethernet_controller.vhd" "20260809130520.000" "20260810225317.873":
+  entity ethernet_controller at 1( 0) + 0 on 422;
+  architecture behavioural of ethernet_controller at 22( 651) + 0 on 423;

@@ -18,7 +18,15 @@ end ethernet_rx;
 
 
 architecture Behavioral of ethernet_rx is
-  type rx_frame_header is (PREAMBLE, SFD, DST_MAC, SRC_MAC, ETHER_TYPE, DATA, INVALID);
+  
+  subtype rx_frame_header is std_logic_vector(3 downto 0);
+  constant INVALID : rx_frame_header := "0000";
+  constant PREAMBLE : rx_frame_header := "0001";
+  constant SFD : rx_frame_header := "0010";
+  constant DST_MAC : rx_frame_header := "0011";
+  constant SRC_MAC : rx_frame_header := "0100";
+  constant ETHER_TYPE : rx_frame_header := "0101";
+  constant DATA : rx_frame_header := "0110";
   
   signal in_data                    : std_logic_vector(2 downto 0) := (others  => '0');
   signal data_reg                   : std_logic_vector(7 downto 0) := (others => '0');
@@ -27,14 +35,14 @@ architecture Behavioral of ethernet_rx is
   signal cycles_since_last_read_bit : std_logic_vector(2 downto 0) := (others => '0'); -- used to ignore mid bit transitions
   signal bytes_read                 : std_logic_vector(9 downto 0) := (others  => '0');
 
-  signal current_header             : rx_frame_header              := INVALID;
+  signal current_header             : rx_frame_header                 := INVALID;
   signal invert_read_bits           : boolean                         := false; -- Identify whether the read bits are received in inverted manner
-  signal frame_dst_mac          : std_logic_vector(47 downto 0) := (others => '0');
+  signal frame_dst_mac              : std_logic_vector(47 downto 0) := (others => '0');
   -- Debug signals
   signal out_bit          : std_logic;
   signal out_EdgeDetected : std_logic;
   signal bit_read_to_reg            : std_logic                    := '0';
-  signal header_switch_state_debug        : STD_LOGIC   := '0';
+  signal header_switch_state_debug        : std_logic   := '0';
   signal preamble_byte_debug              : std_logic :='0';
 begin
   process (clk48)
@@ -96,7 +104,6 @@ begin
                       preamble_byte_debug <= '1';
                     end if;
                   when PREAMBLE =>
-                    preamble_bytes := preamble_bytes + 1;
                     if (invert_read_bits) then
                       temp_byte := not data_reg;
                     else
@@ -149,7 +156,6 @@ begin
                         current_header <= SRC_MAC;
                         data_done      <= data_reg; -- Write full read byte
                         data_out_valid <= '1';
-                        bytes_read     <= std_logic_vector(unsigned(bytes_read) + 1);
                       else 
                         current_header <=INVALID;
                       end if;
@@ -157,11 +163,10 @@ begin
                   when others =>
                     data_done      <= data_reg; -- Write full read byte
                     data_out_valid <= '1';
-                    bytes_read     <= std_logic_vector(unsigned(bytes_read) + 1);
                 end case;
-
-                data_reg       <= in_data(1) & (6 downto 0 => '0');
-                bits_read      <= "0001"; -- Set to 1
+                bytes_read     <= std_logic_vector(unsigned(bytes_read) + 1);
+                data_reg <= in_data(1) & (6 downto 0 => '0');
+                bits_read <= "0001"; -- Set to 1
             end case;
           else
             data_reg  <= in_data(1) & data_reg(7 downto 1); -- Bitshift right and at new bit as MSBit
