@@ -15,7 +15,7 @@ entity ethernet_controller is
     manchester_data_in  : in std_logic;
     manchester_data_out : out std_logic;
     uart_out            : out std_logic;
-    power_on_led        : out std_logic
+    config_loaded_led        : out std_logic
   );
 end ethernet_controller;
 
@@ -71,15 +71,33 @@ architecture Behavioural of ethernet_controller is
     );
   end component;
 
-  -- FIFO 
-  signal fifo_full     : std_logic := '0';
-  signal fifo_empty    : std_logic := '0';
-  signal fifo_write_en : std_logic := '0';
-  signal fifo_read_en  : std_logic := '0';
-  signal fifo_data_in  : std_logic_vector(39 downto 0);
-  signal fifo_data_out : std_logic_vector(39 downto 0);
+  -- uart_tx FIFO
+  signal utx_fifo_full     : std_logic := '0';
+  signal utx_fifo_empty    : std_logic := '0';
+  signal utx_fifo_write_en : std_logic := '0';
+  signal utx_fifo_read_en  : std_logic := '0';
+  signal utx_fifo_data_in  : std_logic_vector(39 downto 0);
+  signal utx_fifo_data_out : std_logic_vector(39 downto 0);
 
-  constant fifo_padding : std_logic_vector(31 downto 0) := (others => '0');
+  -- uart_rx FIFO
+  signal urx_fifo_full     : std_logic := '0';
+  signal urx_fifo_empty    : std_logic := '0';
+  signal urx_fifo_write_en : std_logic := '0';
+  signal urx_fifo_read_en  : std_logic := '0';
+  signal urx_fifo_data_in  : std_logic_vector(39 downto 0);
+  signal urx_fifo_data_out : std_logic_vector(39 downto 0);
+  signal eth_tx_busy : std_logic := '0';
+
+  -- payload_size FIFO
+  signal ps_fifo_full     : std_logic := '0';
+  signal ps_fifo_empty    : std_logic := '0';
+  signal ps_fifo_write_en : std_logic := '0';
+  signal ps_fifo_read_en  : std_logic := '0';
+  signal ps_fifo_data_in  : std_logic_vector(39 downto 0);
+  signal ps_fifo_data_out : std_logic_vector(39 downto 0);
+  signal payload_size_buffer : std_logic_vector(10 downto 0) := (others => '0'); -- To fit 1500 decimal
+
+  constant FIFO_PADDING_32 : std_logic_vector(31 downto 0) := (others => '0');
   -- UART
   signal uart_busy    : std_logic := '0';
   signal uart_start   : std_logic := '0';
@@ -160,7 +178,7 @@ begin
       tx_line  => uart_out
     );
 
-  fifo : CC_FIFO_40K
+  uart_tx_fifo : CC_FIFO_40K -- ETHERNET -> FIFO -> UART
   generic map(
     A_WIDTH   => 10,
     B_WIDTH   => 10,
@@ -172,33 +190,73 @@ begin
     A_CLK   => clk,
     B_CLK   => clk48,
     F_RST_N => '1',
-    A_EN    => fifo_read_en,
-    B_EN    => fifo_write_en,
-    B_WE    => fifo_write_en,
+    A_EN    => utx_fifo_read_en,
+    B_EN    => utx_fifo_write_en,
+    B_WE    => utx_fifo_write_en,
     A_DO    => fifo_data_out,
-    F_FULL  => fifo_full,
-    F_EMPTY => fifo_empty
+    F_FULL  => utx_fifo_full,
+    F_EMPTY => utx_fifo_empty
   );
 
-  fifo_write : process (clk48) begin
+  uart_rx_fifo : CC_FIFO_40K -- UART -> FIFO -> ETHERNET
+  generic map(
+    A_WIDTH   => 10,
+    B_WIDTH   => 10,
+    FIFO_MODE => "ASYNC"
+  )
+  port map
+  (
+    B_DI    => fifo_data_in,
+    A_CLK   => clk,
+    B_CLK   => clk48,
+    F_RST_N => '1',
+    A_EN    => utx_fifo_read_en,
+    B_EN    => utx_fifo_write_en,
+    B_WE    => utx_fifo_write_en,
+    A_DO    => fifo_data_out,
+    F_FULL  => utx_fifo_full,
+    F_EMPTY => utx_fifo_empty
+  );
+
+  payload_size_fifo : CC_FIFO_40K -- Use to store payload size for uart_rx_fifo payload
+  generic map(
+    A_WIDTH   => 10,
+    B_WIDTH   => 10,
+    FIFO_MODE => "ASYNC"
+  )
+  port map
+  (
+    B_DI    => fifo_data_in,
+    A_CLK   => clk,
+    B_CLK   => clk48,
+    F_RST_N => '1',
+    A_EN    => utx_fifo_read_en,
+    B_EN    => utx_fifo_write_en,
+    B_WE    => utx_fifo_write_en,
+    A_DO    => fifo_data_out,
+    F_FULL  => utx_fifo_full,
+    F_EMPTY => utx_fifo_empty
+  );
+
+  utx_fifo_write : process (clk48) begin
     if (rising_edge(clk48)) then
-      fifo_write_en <= '0';
-      if (eth_data_ready = '1' and fifo_full /= '1') then
-        fifo_write_en <= '1';
-        fifo_data_in  <= fifo_padding & eth_data_out;
+      utx_fifo_write_en <= '0';
+      if (eth_data_ready = '1' and utx_fifo_full /= '1') then
+        utx_fifo_write_en <= '1';
+        fifo_data_in  <= FIFO_PADDING_32 & eth_data_out; 
       end if;
     end if;
   end process;
 
-  fifo_read : process (clk) begin
+  utx_fifo_read : process (clk) begin
     if rising_edge(clk) then
-      fifo_read_en <= '0';
+      utx_fifo_read_en <= '0';
       uart_start   <= '0';
 
       case read_state is
         when IDLE =>
-          if (fifo_empty = '0' and uart_busy = '0') then
-            fifo_read_en <= '1';
+          if (utx_fifo_empty = '0' and uart_busy = '0') then
+            utx_fifo_read_en <= '1';
             read_state   <= WAIT_FOR_RAM;
           end if;
 
@@ -225,5 +283,32 @@ begin
     end if;
   end process;
 
-  power_on_led <= '1';
+  urx_fifo_read : process (clk20) begin -- Sync read from UART Buffer
+    variable read_bytes : integer := 0;
+    if rising_edge(clk20) then
+      if (eth_tx_busy = '0') then
+        if (ps_fifo_empty = '0') then -- Trigger read from Payload Size Fifo
+          ps_fifo_read_en => '1';
+        end if;
+        if (ps_fifo_read_en = '1') then -- Trigger read from Data Fifo and Size Fifo Read 
+          payload_size_buffer <= ps_fifo_data_out(10 downto 0); -- Others are padding
+          ps_fifo_read_en => '0';
+          urx_fifo_read_en <= '1';
+        end if;
+        if (urx_fifo_read_en = '1') then -- Start reading
+          if (read_bytes < to_integer(unsigned(payload_size_buffer)) or urx_fifo_empty = '0') then
+            read_bytes := read_bytes + 1;
+          else -- reset stuff
+            payload_size_buffer <= (others => '0');
+            ps_fifo_read_en <= '0';
+            read_bytes := 0;
+          end if; 
+        end if;
+      end if; 
+    end if;
+  end process;
+
+  -- TODO UART FIFO write (from Pico to FIFO)
+  
+  config_loaded_led <= '1';
 end architecture;
