@@ -4,22 +4,13 @@ use IEEE.NUMERIC_STD.all;
 
 entity ethernet_tx is
   generic (
-    -- IP source: 192.168.21.12
-    IPsource_1 : integer := 192;
-    IPsource_2 : integer := 168;
-    IPsource_3 : integer := 21;
-    IPsource_4 : integer := 12;
-    -- IP destination: 192.168.21.11
-    IPdestination_1 : integer := 192;
-    IPdestination_2 : integer := 168;
-    IPdestination_3 : integer := 21;
-    IPdestination_4 : integer := 11;
-    -- Physical Address (Dest MAC): 54:E1:AD:1B:10:0D
-    FPGA_MAC_ADDRESS : std_logic_vector(47 downto 0) := x"00_12_34_56_78_90";
-    DESTINATION_MAC_ADDRESS : std_logic_vector(47 downto 0) := x"FF_FF_FF_FF_FF_FF"
+    FPGA_MAC_ADDRESS        : std_logic_vector(47 downto 0) := x"00_12_34_56_78_90";
+    DESTINATION_MAC_ADDRESS : std_logic_vector(47 downto 0) := x"FF_FF_FF_FF_FF_FF";
+    ETHER_TYPE_WORD         : std_logic_vector(15 downto 0) := x"0800";
+    PAYLOAD_SIZE            : integer                       := 128
   );
   port (
-    clk20        : in std_logic; -- 10MHz Input Clock on FPGA | 20Mhz Input clock on Testbench -- TODO revert/comment when switch between FPGA and Testbench
+    clk20        : in std_logic;
     Ethernet_TDp : out std_logic;
     Ethernet_TDm : out std_logic
   );
@@ -27,58 +18,51 @@ end ethernet_tx;
 
 architecture Behavioral of ethernet_tx is
 
-  -- Pre-calculate Checksum (Static logic)
-  constant sum1 : unsigned(31 downto 0) := x"0000C53F" +
-  to_unsigned(IPsource_1 * 256 + IPsource_2, 32) +
-  to_unsigned(IPsource_3 * 256 + IPsource_4, 32) +
-  to_unsigned(IPdestination_1 * 256 + IPdestination_2, 32) +
-  to_unsigned(IPdestination_3 * 256 + IPdestination_4, 32);
-  constant sum2        : unsigned(31 downto 0)         := (sum1 and x"0000FFFF") + shift_right(sum1, 16);
-  constant sum3        : unsigned(31 downto 0)         := not ((sum2 and x"0000FFFF") + shift_right(sum2, 16));
-  constant IPchecksum3 : std_logic_vector(15 downto 0) := std_logic_vector(sum3(15 downto 0));
-
-  -- signal clk20             : std_logic; -- TODO revert/comment when switch between FPGA and Testbench
-  signal counter                   : unsigned(19 downto 0)         := (others => '0'); -- Counter reduced because the simulation takes too long when frame TX starts at 0.8s
-  signal StartSending              : std_logic                     := '0';
-  signal rdaddress                 : unsigned(7 downto 0)          := (others => '0');
-  signal pkt_data                  : std_logic_vector(7 downto 0)  := (others => '0');
-  signal ShiftCount                : unsigned(3 downto 0)          := x"F";
-  signal SendingPacket             : std_logic                     := '0';
-  signal ShiftData                 : std_logic_vector(7 downto 0)  := (others => '0');
-  signal CRC                       : std_logic_vector(31 downto 0) := (others => '0');
-  signal CRCflush                  : std_logic                     := '0';
-  signal CRCinit                   : std_logic                     := '0';
-  signal LinkPulseCount            : unsigned(17 downto 0)         := (others => '0');
-  signal LinkPulse                 : std_logic                     := '0';
-  signal SendingPacketData         : std_logic                     := '0';
-  signal idlecount                 : unsigned(2 downto 0)          := "111";
-  signal qo                        : std_logic                     := '1';
-  signal qoe                       : std_logic                     := '0';
-  constant DATA_SIZE               : integer                       := 128; -- byte of raw data
-  constant END_OF_DATA             : integer                       := 50 + DATA_SIZE - 1; -- 113 when Data is 64B
-  constant endOfPacket             : integer                       := END_OF_DATA + 5; -- 118 when data is 64B
-  constant HARD_CODED_BASE_IP_LEN  : integer                       := 20;
-  constant HARD_CODED_BASE_UDP_LEN : integer                       := 8;
-  signal UDP_LEN                   : std_logic_vector(15 downto 0) := std_logic_vector(
-  to_unsigned(HARD_CODED_BASE_UDP_LEN + DATA_SIZE, 16)
+  -- Frame TX state machine
+  -- Each state owns a contiguous set of bytes in the outgoing frame.
+  -- Transitions happen on the byte boundary (ShiftCount = 15, v_readram = '1').
+  type tx_state_t is (
+    IDLE,
+    PREAMBLE, -- 7 bytes 0x55
+    SFD, -- 1 byte  0xD5  (CRC initialised here)
+    DST_MAC, -- 6 bytes destination MAC
+    SRC_MAC, -- 6 bytes source MAC
+    ETHER_TYPE, -- 2 bytes EtherType/Length
+    PAYLOAD, -- PAYLOAD_SIZE bytes (replace mux arm with your data source)
+    FCS, -- 4 bytes CRC-32 shifted out via CRCflush mechanism
+    EOF_ST -- 1 dummy byte slot; SendingPacket cleared mid-slot at ShiftCount=14
   );
-  signal IP_LEN : std_logic_vector(15 downto 0) := std_logic_vector(to_unsigned(
-  HARD_CODED_BASE_UDP_LEN + DATA_SIZE + HARD_CODED_BASE_IP_LEN, 16));
+
+  signal state             : tx_state_t                    := IDLE;
+  signal byte_count        : unsigned(10 downto 0)         := (others => '0');
+  signal counter           : unsigned(19 downto 0)         := (others => '0');
+  signal StartSending      : std_logic                     := '0';
+  signal pkt_data          : std_logic_vector(7 downto 0)  := (others => '0');
+  signal ShiftCount        : unsigned(3 downto 0)          := x"F";
+  signal SendingPacket     : std_logic                     := '0';
+  signal ShiftData         : std_logic_vector(7 downto 0)  := (others => '0');
+  signal CRC               : std_logic_vector(31 downto 0) := (others => '0');
+  signal CRCflush          : std_logic                     := '0';
+  signal CRCinit           : std_logic                     := '0';
+  signal LinkPulseCount    : unsigned(17 downto 0)         := (others => '0');
+  signal LinkPulse         : std_logic                     := '0';
+  signal SendingPacketData : std_logic                     := '0';
+  signal idlecount         : unsigned(2 downto 0)          := "111";
+  signal qo                : std_logic                     := '1';
+  signal qoe               : std_logic                     := '0';
 
 begin
 
-  -- Main Process (Synchronous logic only)
-  process (clk20) -- TODO revert/comment when switch between FPGA and Testbench
-    -- Variables for local combinational-like logic inside the process
+  process (clk20)
     variable v_readram  : std_logic;
     variable v_CRCinput : std_logic;
     variable v_dataout  : std_logic;
-    variable v_addr_int : integer;
+    variable v_bc       : integer;
   begin
-    if clk20'event and clk20 = '1' then
-      v_addr_int := to_integer(rdaddress);
+    if rising_edge(clk20) then
+      v_bc := to_integer(byte_count);
 
-      -- Packet Trigger (~0.8s). Afeter changed counter size the Pack trigger is around 50ms from start of simulation
+      -- Packet trigger (~50 ms with 20-bit counter at 20 MHz)
       counter <= counter + 1;
       if counter = x"FFFFF" then
         StartSending <= '1';
@@ -86,83 +70,150 @@ begin
         StartSending <= '0';
       end if;
 
-      -- Data ROM Logic
-      case v_addr_int is
-        when 0 | 1 | 2 | 3 | 4 | 5 | 6 => pkt_data <= x"55";
-        when 7                         => pkt_data                         <= x"D5";
-        when 8                         => pkt_data                         <= DESTINATION_MAC_ADDRESS(47 downto 40);
-        when 9                         => pkt_data                         <= DESTINATION_MAC_ADDRESS(39 downto 32);
-        when 10                        => pkt_data                        <= DESTINATION_MAC_ADDRESS(31 downto 24);
-        when 11                        => pkt_data                        <= DESTINATION_MAC_ADDRESS(23 downto 16);
-        when 12                        => pkt_data                        <= DESTINATION_MAC_ADDRESS(15 downto 8);
-        when 13                        => pkt_data                        <= DESTINATION_MAC_ADDRESS(7 downto 0);
-        when 14                        => pkt_data                        <= FPGA_MAC_ADDRESS(47 downto 40);
-        when 15                        => pkt_data                        <= FPGA_MAC_ADDRESS(39 downto 32);
-        when 16                        => pkt_data                        <= FPGA_MAC_ADDRESS(31 downto 24);
-        when 17                        => pkt_data                        <= FPGA_MAC_ADDRESS(23 downto 16);
-        when 18                        => pkt_data                        <= FPGA_MAC_ADDRESS(15 downto 8);
-        when 19                        => pkt_data                        <= FPGA_MAC_ADDRESS(7 downto 0);
-        when 20                        => pkt_data                        <= x"08"; -- Ether type / Length 1st Byte
-        when 21                        => pkt_data                        <= x"00"; -- Ether type / Length 2nd Byte
-        when 22                        => pkt_data                        <= x"45";
-        when 23                        => pkt_data                        <= x"00";
-        when 24                        => pkt_data                        <= IP_LEN(15 downto 8);-- x"00"; -- IP size 1st Byte
-        when 25                        => pkt_data                        <= IP_LEN(7 downto 0); -- std_logic_vector(to_unsigned(46 - 18 + DATA_SIZE, 8));-- x"5C"; -- IP size 2nd Byte
-        when 26                        => pkt_data                        <= x"00";
-        when 27                        => pkt_data                        <= x"00";
-        when 28                        => pkt_data                        <= x"00";
-        when 29                        => pkt_data                        <= x"00";
-        when 30                        => pkt_data                        <= x"80";
-        when 31                        => pkt_data                        <= x"11";
-        when 32                        => pkt_data                        <= IPchecksum3(15 downto 8);
-        when 33                        => pkt_data                        <= IPchecksum3(7 downto 0);
-        when 34                        => pkt_data                        <= std_logic_vector(to_unsigned(IPsource_1, 8));
-        when 35                        => pkt_data                        <= std_logic_vector(to_unsigned(IPsource_2, 8));
-        when 36                        => pkt_data                        <= std_logic_vector(to_unsigned(IPsource_3, 8));
-        when 37                        => pkt_data                        <= std_logic_vector(to_unsigned(IPsource_4, 8));
-        when 38                        => pkt_data                        <= std_logic_vector(to_unsigned(IPdestination_1, 8));
-        when 39                        => pkt_data                        <= std_logic_vector(to_unsigned(IPdestination_2, 8));
-        when 40                        => pkt_data                        <= std_logic_vector(to_unsigned(IPdestination_3, 8));
-        when 41                        => pkt_data                        <= std_logic_vector(to_unsigned(IPdestination_4, 8));
-        when 42                        => pkt_data                        <= x"04";
-        when 43                        => pkt_data                        <= x"00";
-        when 44                        => pkt_data                        <= x"04";
-        when 45                        => pkt_data                        <= x"00";
-        when 46                        => pkt_data                        <= UDP_LEN(15 downto 8);--  x"00"; -- UDP size 1st byte
-        when 47                        => pkt_data                        <= UDP_LEN(7 downto 0);-- std_logic_vector(to_unsigned(8 + DATA_SIZE, 8)); -- UDP size 2nd byte
-        when 48                        => pkt_data                        <= x"00";
-        when 49                        => pkt_data                        <= x"00";
-        when 50 to END_OF_DATA         => pkt_data         <= std_logic_vector(to_unsigned(v_addr_int - 50, 8));
-        when others                    => pkt_data                    <= x"00";
+      -- Data mux: presents the byte for the current state/byte_count.
+      -- pkt_data must be valid on the same cycle as v_readram='1' so it is
+      -- registered into ShiftData at the byte boundary.
+      case state is
+          -- IDLE must mirror PREAMBLE here.  In IDLE, ShiftCount is held at 15 so
+          -- v_readram fires every cycle.  pkt_data is a registered signal, meaning
+          -- the value loaded into ShiftData on the first v_readram after StartSending
+          -- is whatever pkt_data was on the *previous* clock -- i.e. still computed
+          -- from state=IDLE.  By giving IDLE the same output as PREAMBLE the first
+          -- byte loaded into ShiftData is 0x55, not 0x00.
+        when IDLE | PREAMBLE =>
+          pkt_data <= x"55";
+
+        when SFD =>
+          pkt_data <= x"D5";
+
+        when DST_MAC =>
+          case v_bc is
+            when 0      => pkt_data      <= DESTINATION_MAC_ADDRESS(47 downto 40);
+            when 1      => pkt_data      <= DESTINATION_MAC_ADDRESS(39 downto 32);
+            when 2      => pkt_data      <= DESTINATION_MAC_ADDRESS(31 downto 24);
+            when 3      => pkt_data      <= DESTINATION_MAC_ADDRESS(23 downto 16);
+            when 4      => pkt_data      <= DESTINATION_MAC_ADDRESS(15 downto 8);
+            when others => pkt_data <= DESTINATION_MAC_ADDRESS(7 downto 0);
+          end case;
+
+        when SRC_MAC =>
+          case v_bc is
+            when 0      => pkt_data      <= FPGA_MAC_ADDRESS(47 downto 40);
+            when 1      => pkt_data      <= FPGA_MAC_ADDRESS(39 downto 32);
+            when 2      => pkt_data      <= FPGA_MAC_ADDRESS(31 downto 24);
+            when 3      => pkt_data      <= FPGA_MAC_ADDRESS(23 downto 16);
+            when 4      => pkt_data      <= FPGA_MAC_ADDRESS(15 downto 8);
+            when others => pkt_data <= FPGA_MAC_ADDRESS(7 downto 0);
+          end case;
+
+        when ETHER_TYPE =>
+          if v_bc = 0 then
+            pkt_data <= ETHER_TYPE_WORD(15 downto 8);
+          else
+            pkt_data <= ETHER_TYPE_WORD(7 downto 0);
+          end if;
+
+        when PAYLOAD =>
+          -- Sequential test pattern; replace with your actual payload source
+          -- indexed by byte_count (e.g. a BRAM read-address).
+          pkt_data <= std_logic_vector(byte_count(7 downto 0));
+
+        when others =>
+          pkt_data <= x"00";
       end case;
 
-      -- Serialization Control
+      -- v_readram pulses for one cycle at the byte boundary (ShiftCount = 15).
+      -- This is the load strobe: ShiftData captures pkt_data, byte_count advances.
       if ShiftCount = 15 then
         v_readram := '1';
       else
         v_readram := '0';
       end if;
 
+      -- SendingPacket / frame envelope control.
       if StartSending = '1' then
         SendingPacket <= '1';
-      elsif ShiftCount = 14 and v_addr_int = endOfPacket then
+        state         <= PREAMBLE;
+        byte_count    <= (others => '0');
+      elsif ShiftCount = 14 and state = EOF_ST then
+        -- Matches original: SendingPacket cleared at ShiftCount=14 in the last
+        -- dummy byte slot, identical to "ShiftCount=14 and addr=endOfPacket".
         SendingPacket <= '0';
+        state         <= IDLE;
+        byte_count    <= (others => '0');
       end if;
 
+      -- ShiftCount: free-runs 0-15 during transmission, held at 15 in IDLE.
       if SendingPacket = '1' then
         ShiftCount <= ShiftCount + 1;
       else
         ShiftCount <= x"F";
       end if;
 
-      if v_readram = '1' then
-        if SendingPacket = '1' then
-          rdaddress <= rdaddress + 1;
-        else
-          rdaddress <= (others => '0');
-        end if;
+      -- State machine advancement: one state/byte_count step per byte boundary.
+      if v_readram = '1' and SendingPacket = '1' then
+        case state is
+
+          when PREAMBLE =>
+            if byte_count = 6 then
+              state      <= SFD;
+              byte_count <= (others => '0');
+            else
+              byte_count <= byte_count + 1;
+            end if;
+
+          when SFD =>
+            state      <= DST_MAC;
+            byte_count <= (others => '0');
+
+          when DST_MAC =>
+            if byte_count = 5 then
+              state      <= SRC_MAC;
+              byte_count <= (others => '0');
+            else
+              byte_count <= byte_count + 1;
+            end if;
+
+          when SRC_MAC =>
+            if byte_count = 5 then
+              state      <= ETHER_TYPE;
+              byte_count <= (others => '0');
+            else
+              byte_count <= byte_count + 1;
+            end if;
+
+          when ETHER_TYPE =>
+            if byte_count = 1 then
+              state      <= PAYLOAD;
+              byte_count <= (others => '0');
+            else
+              byte_count <= byte_count + 1;
+            end if;
+
+          when PAYLOAD =>
+            if byte_count = to_unsigned(PAYLOAD_SIZE - 1, 11) then
+              state      <= FCS;
+              byte_count <= (others => '0');
+            else
+              byte_count <= byte_count + 1;
+            end if;
+
+          when FCS =>
+            if byte_count = 3 then
+              state      <= EOF_ST;
+              byte_count <= (others => '0');
+            else
+              byte_count <= byte_count + 1;
+            end if;
+
+          when others =>
+            null;
+
+        end case;
       end if;
 
+      -- Shift register: loads pkt_data at byte boundary, shifts LSB out each bit period.
+      -- ShiftCount(0) selects odd half-cycles (bit transitions in Manchester encoding).
       if ShiftCount(0) = '1' then
         if v_readram = '1' then
           ShiftData <= pkt_data;
@@ -171,21 +222,27 @@ begin
         end if;
       end if;
 
-      -- CRC Calculation
+      -- CRC-32 (poly 0x04C11DB7) computation.
+      -- v_CRCinput is forced to '0' during CRCflush so the register just shifts
+      -- while the CRC bits are being clocked out to the wire.
       if CRCflush = '1' then
         v_CRCinput := '0';
       else
         v_CRCinput := ShiftData(0) xor CRC(31);
       end if;
 
+      -- CRCflush: set at the first byte boundary of FCS (equivalent to original
+      -- "addr = END_OF_DATA+1"). Stays high via SendingPacket until EOF_ST clears it.
       if CRCflush = '1' then
         CRCflush <= SendingPacket;
-      elsif v_readram = '1' and v_addr_int = END_OF_DATA + 1 then
+      elsif v_readram = '1' and state = FCS and byte_count = 0 then
         CRCflush <= '1';
       end if;
 
+      -- CRCinit: asserted for the SFD byte slot so the CRC register is reset to
+      -- all-1s on the first bit of DST_MAC, matching the original addr=7 trigger.
       if v_readram = '1' then
-        if v_addr_int = 7 then
+        if state = SFD then
           CRCinit <= '1';
         else
           CRCinit <= '0';
@@ -198,11 +255,11 @@ begin
         elsif v_CRCinput = '1' then
           CRC <= (CRC(30 downto 0) & '0') xor x"04C11DB7";
         else
-          CRC <= (CRC(30 downto 0) & '0');
+          CRC <= CRC(30 downto 0) & '0';
         end if;
       end if;
 
-      -- Normal Link Pulse (NLP) Generation
+      -- Normal Link Pulse (NLP) for 10Base-T link integrity (~16 ms period).
       if SendingPacket = '1' then
         LinkPulseCount <= (others => '0');
       else
@@ -215,7 +272,9 @@ begin
         LinkPulse <= '0';
       end if;
 
-      -- Manchester Encoder Logic
+      -- Manchester encoder.
+      -- SendingPacketData is SendingPacket delayed one cycle so the last half-bit
+      -- of the final byte is still driven before the line returns to idle.
       SendingPacketData <= SendingPacket;
       if SendingPacketData = '1' then
         idlecount <= "000";
@@ -248,6 +307,7 @@ begin
         Ethernet_TDp <= '0';
         Ethernet_TDm <= '0';
       end if;
+
     end if;
   end process;
 
