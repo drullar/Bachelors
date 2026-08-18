@@ -9,7 +9,7 @@ set OFL=../../bin/openFPGALoader/openFPGALoader.exe
 set TOP=ethernet_controller
 set VLOG_SRC=src/ethernet_tx.v
 :: used design files. The 
-set VHDL_SRC=src/custom_types_pkg.vhd src/uart_tx.vhd src/ethernet_tx.vhd src/ethernet_rx.vhd src/ethernet_controller.vhd
+set VHDL_SRC=src/custom_types_pkg.vhd src/uart_rx.vhd src/uart_tx.vhd src/ethernet_tx.vhd src/ethernet_rx.vhd src/ethernet_controller.vhd
 set LOG=0
 
 :: Place&Route arguments
