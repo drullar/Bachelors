@@ -41,7 +41,7 @@
         "pads": {
           "drill": 0.8,
           "height": 1.27,
-          "width": 2.54
+          "width": 1.27
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -488,7 +488,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "schematic.kicad_pro",
+    "filename": "ethernet_controller.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -590,6 +590,18 @@
         },
         {
           "group_by": true,
+          "label": "Exclude from Simulation",
+          "name": "${EXCLUDE_FROM_SIM}",
+          "show": true
+        },
+        {
+          "group_by": true,
+          "label": "Exclude from Position Files",
+          "name": "${EXCLUDE_FROM_POS_FILES}",
+          "show": true
+        },
+        {
+          "group_by": true,
           "label": "Footprint",
           "name": "Footprint",
           "show": true
@@ -644,17 +656,17 @@
     "subpart_id_separator": 0,
     "top_level_sheets": [
       {
-        "filename": "schematic.kicad_sch",
+        "filename": "ethernet_controller.kicad_sch",
         "name": "Root",
-        "uuid": "66487704-f22f-4d33-845d-3fdcb3aba272"
+        "uuid": "93aae6a7-013c-4e77-8024-2e8b2e435736"
       }
     ],
-    "used_designators": "U3-5,R1,J2,#PWR9-10,T1-2",
+    "used_designators": "EthernetRx1-2,IOT_I1,U1-2",
     "variants": []
   },
   "sheets": [
     [
-      "66487704-f22f-4d33-845d-3fdcb3aba272",
+      "93aae6a7-013c-4e77-8024-2e8b2e435736",
       "Root"
     ]
   ],
