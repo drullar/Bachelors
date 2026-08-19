@@ -95,13 +95,12 @@ architecture Behavioural of ethernet_controller is
   signal urx_state : urx_state_t := URX_IDLE;
 
   -- payload_size FIFO
-  signal ps_fifo_full        : std_logic := '0';
-  signal ps_fifo_empty       : std_logic := '0';
-  signal ps_fifo_write_en    : std_logic := '0';
-  signal ps_fifo_read_en     : std_logic := '0';
-  signal ps_fifo_data_in     : std_logic_vector(39 downto 0);
-  signal ps_fifo_data_out    : std_logic_vector(39 downto 0);
-  signal payload_size_buffer : std_logic_vector(10 downto 0) := (others => '0'); -- To fit 1500 decimal
+  signal ps_fifo_full     : std_logic := '0';
+  signal ps_fifo_empty    : std_logic := '0';
+  signal ps_fifo_write_en : std_logic := '0';
+  signal ps_fifo_read_en  : std_logic := '0';
+  signal ps_fifo_data_in  : std_logic_vector(39 downto 0);
+  signal ps_fifo_data_out : std_logic_vector(39 downto 0);
 
   constant FIFO_PADDING_32 : std_logic_vector(31 downto 0) := (others => '0');
   constant FIFO_PADDING_29 : std_logic_vector(28 downto 0) := (others => '0');
@@ -114,19 +113,18 @@ architecture Behavioural of ethernet_controller is
   signal eth_data_ready : std_logic := '0';
   signal eth_data_out   : std_logic_vector(7 downto 0);
 
-  type read_state_Type is (IDLE, READ_FIFO, WAIT_FOR_RAM, START_UART, WAIT_FOR_TX);
+  type read_state_Type is (IDLE, WAIT_FOR_RAM, START_UART, WAIT_FOR_TX);
   signal read_state : read_state_type := IDLE;
 
   -- UART_RX
   signal uart_rx_valid    : std_logic                    := '0';
   signal uart_rx_data_out : std_logic_vector(7 downto 0) := (others => '0');
   -- UART_RX "packet" segments. Packet structure PAYLOAD_LENGTH, DESTINATION_MAC, ETH_TYPE, PAYLOAD
-  signal uart_rx_payload_len  : std_logic_vector(15 downto 0) := (others => '0');
-  signal uart_rx_dst_mac      : std_logic_vector(47 downto 0) := (others => '0');
-  signal uart_rx_ether_type   : std_logic_vector(15 downto 0) := (others => '0');
-  signal uart_rx_payload_byte : std_logic_vector(7 downto 0)  := (others => '0');
+  signal uart_rx_payload_len : std_logic_vector(15 downto 0) := (others => '0');
+  signal uart_rx_dst_mac     : std_logic_vector(47 downto 0) := (others => '0');
+  signal uart_rx_ether_type  : std_logic_vector(15 downto 0) := (others => '0');
 
-  type uart_read_parse_t is (URP_IDLE, URP_LEN, URP_DST_MAC, URP_ETH_TYPE, URP_FIFO_WRITE, URP_PAYLOAD, URP_DONE); -- uart_read_parse = URP
+  type uart_read_parse_t is (URP_IDLE, URP_LEN, URP_DST_MAC, URP_ETH_TYPE, URP_FIFO_WRITE, URP_PAYLOAD, URP_PAYLOAD_PADDING, URP_DONE); -- uart_read_parse = URP
   signal current_uart_parse_state : uart_read_parse_t := URP_IDLE;
 
   constant UART_RX_TIMEOUT_GOAL : integer := UART_RX_CLK / 1000; -- 1mS
@@ -279,6 +277,45 @@ begin
     end if;
   end process;
 
+  -- Reads bytes from utx_fifo (filled by ethernet_rx) and forwards them to uart_tx.
+  -- Runs on clk (10 MHz) matching uart_tx's clock and utx_fifo's A_CLK.
+  utx_fifo_read : process (clk) begin
+    if rising_edge(clk) then
+      utx_fifo_read_en <= '0';
+      uart_start       <= '0';
+
+      case read_state is
+
+        when IDLE =>
+          if utx_fifo_empty = '0' and uart_busy = '0' then
+            utx_fifo_read_en <= '1';
+            read_state       <= WAIT_FOR_RAM;
+          end if;
+
+          -- One dead cycle for CC_FIFO_40K registered output to settle
+        when WAIT_FOR_RAM =>
+          read_state <= START_UART;
+
+          -- Capture stable data and trigger uart_tx
+        when START_UART =>
+          uart_data_in <= utx_fifo_data_out(7 downto 0);
+          uart_start   <= '1';
+          read_state   <= WAIT_FOR_TX;
+
+          -- Wait for uart_tx to finish before fetching the next byte.
+          -- uart_start is already '0' (reset at top) so the only gate is uart_busy.
+        when WAIT_FOR_TX =>
+          if uart_busy = '0' and uart_start = '0' then
+            read_state <= IDLE;
+          end if;
+
+        when others =>
+          read_state <= IDLE;
+
+      end case;
+    end if;
+  end process;
+
   urx_fifo_read : process (clk20) begin
     if rising_edge(clk20) then
       ps_fifo_read_en <= '0';
@@ -331,7 +368,6 @@ begin
 
   uart_data_parse : process (clk48) -- TODO add 1 ms timeout logic
     variable read_bytes           : integer := 0;
-    variable reset                : boolean := false; -- TODO use reset to handle case when UART does not receive full payload
     variable timeout_counter      : integer := 0;
     variable fifo_write_bytes_cnt : integer := 0;
   begin
@@ -343,10 +379,9 @@ begin
         if (timeout_counter = UART_RX_TIMEOUT_GOAL) then
           current_uart_parse_state <= URP_IDLE;
           read_bytes := 0;
-          uart_rx_dst_mac      <= (others => '0');
-          uart_rx_payload_byte <= (others => '0');
-          uart_rx_payload_len  <= (others => '0');
-          uart_rx_ether_type   <= (others => '0');
+          uart_rx_dst_mac     <= (others => '0');
+          uart_rx_payload_len <= (others => '0');
+          uart_rx_ether_type  <= (others => '0');
         end if;
       else
         timeout_counter := 0;
@@ -359,10 +394,9 @@ begin
             current_uart_parse_state <= URP_LEN;
           else -- Variable reset logic
             read_bytes := 0;
-            uart_rx_dst_mac      <= (others => '0');
-            uart_rx_payload_byte <= (others => '0');
-            uart_rx_payload_len  <= (others => '0');
-            uart_rx_ether_type   <= (others => '0');
+            uart_rx_dst_mac     <= (others => '0');
+            uart_rx_payload_len <= (others => '0');
+            uart_rx_ether_type  <= (others => '0');
           end if;
 
         when URP_LEN =>
@@ -440,17 +474,39 @@ begin
             urx_fifo_write_en <= '1';
             read_bytes := read_bytes + 1;
           end if;
-          if read_bytes - 10 >= to_integer(unsigned(uart_rx_payload_len)) then
+          if read_bytes - 10 >= to_integer(unsigned(uart_rx_payload_len)) then -- (read_bytes - 10) = read_bytes without previous headers
+            if to_integer(unsigned(uart_rx_payload_len)) < 46 then
+              current_uart_parse_state <= URP_PAYLOAD_PADDING;
+            else
+              current_uart_parse_state <= URP_DONE;
+            end if;
+          end if;
+        when URP_PAYLOAD_PADDING =>
+          -- read_bytes enters here as 10 + actual_payload_len.
+          -- Loop until read_bytes = 56 (10 header + 46 min payload), writing 0x00 each cycle.
+          -- urx_fifo_full guard prevents read_bytes advancing without an actual FIFO write.
+          if read_bytes < 46 + 10 and urx_fifo_full = '0' then
+            urx_fifo_data_in  <= FIFO_PADDING_32 & x"00";
+            urx_fifo_write_en <= '1';
+            read_bytes := read_bytes + 1;
+          elsif read_bytes >= 46 + 10 then
             current_uart_parse_state <= URP_DONE;
           end if;
         when URP_DONE =>
           -- Commit the frame descriptor to ps_fifo so the dispatcher can trigger ethernet_tx.
           -- Descriptor value = payload bytes + 8 (6 DST_MAC + 2 EtherType already in urx_fifo).
           if ps_fifo_full = '0' then
-            ps_fifo_data_in <= FIFO_PADDING_29 &
-              std_logic_vector(
-              unsigned(uart_rx_payload_len(10 downto 0)) + to_unsigned(8, 11)
-              );
+            if unsigned(uart_rx_payload_len(10 downto 0)) < 46 then
+              -- Padded frame: urx_fifo always holds exactly 54 bytes
+              -- (8 header from URP_FIFO_WRITE + 46 padded payload from URP_PAYLOAD + URP_PAYLOAD_PADDING).
+              -- The original payload length plays no part in the descriptor here.
+              ps_fifo_data_in <= FIFO_PADDING_29 & std_logic_vector(to_unsigned(54, 11));
+            else
+              ps_fifo_data_in <= FIFO_PADDING_29 &
+                std_logic_vector(
+                unsigned(uart_rx_payload_len(10 downto 0)) + to_unsigned(8, 11)
+                );
+            end if;
             ps_fifo_write_en <= '1';
             read_bytes           := 0;
             fifo_write_bytes_cnt := 0;
