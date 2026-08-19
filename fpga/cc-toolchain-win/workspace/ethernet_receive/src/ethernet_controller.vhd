@@ -113,7 +113,7 @@ architecture Behavioural of ethernet_controller is
   signal eth_data_ready : std_logic := '0';
   signal eth_data_out   : std_logic_vector(7 downto 0);
 
-  type read_state_Type is (IDLE, WAIT_FOR_RAM, START_UART, WAIT_FOR_TX);
+  type read_state_Type is (IDLE, WAIT_FOR_RAM, WAIT_FOR_RAM_2, START_UART, WAIT_FOR_TX);
   signal read_state : read_state_type := IDLE;
 
   -- UART_RX
@@ -292,8 +292,14 @@ begin
             read_state       <= WAIT_FOR_RAM;
           end if;
 
-          -- One dead cycle for CC_FIFO_40K registered output to settle
+          -- First dead cycle after read enable (block RAM capturing address)
         when WAIT_FOR_RAM =>
+          read_state <= WAIT_FOR_RAM_2;
+
+          -- Second dead cycle: accommodates the extra latency of the first read
+          -- after a drain-then-refill transition on GateMate CC_FIFO_40K ASYNC.
+          -- A_DO is guaranteed stable by the time START_UART samples it.
+        when WAIT_FOR_RAM_2 =>
           read_state <= START_UART;
 
           -- Capture stable data and trigger uart_tx

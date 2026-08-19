@@ -25,11 +25,12 @@ entity ethernet_tx is
     -- FIFO streaming interface (A-side of uart_rx_fifo, clk20 domain).
     -- FIFO data layout: DST_MAC (6B) | EtherType (2B) | payload (N bytes)
     -- The rx engine reads bytes in sequence:
-    --   DST_MAC state    -> FIFO bytes 0..5   (6 reads)
-    --   ETHER_TYPE state -> FIFO bytes 6..7   (2 reads, after SRC_MAC which uses no FIFO)
-    --   PAYLOAD state    -> FIFO bytes 8..N+7 (N reads)
-    -- fifo_rd_en is pulsed at ShiftCount=12 giving 2-cycle margin before the
-    -- byte is loaded into ShiftData at ShiftCount=15.
+    --   DST_MAC state    → FIFO bytes 0..5   (6 reads)
+    --   ETHER_TYPE state → FIFO bytes 6..7   (2 reads, after SRC_MAC which uses no FIFO)
+    --   PAYLOAD state    → FIFO bytes 8..N+7 (N reads)
+    -- fifo_rd_en is pulsed at ShiftCount=11 giving a 3-cycle margin before the
+    -- byte is loaded into ShiftData at ShiftCount=15, accommodating the extra
+    -- latency cycle observed on GateMate CC_FIFO_40K after a drain-then-refill.
     fifo_rd_en : out std_logic;
     fifo_data  : in std_logic_vector(7 downto 0);
     fifo_empty : in std_logic
@@ -70,9 +71,10 @@ architecture Behavioral of ethernet_tx is
   signal payload_len_r : unsigned(10 downto 0) := (others => '0');
 
   -- Registered FIFO read-enable.
-  -- Asserted at ShiftCount=12 for FIFO-consuming states.  With the CC_FIFO_40K
-  -- having at most 2-cycle output latency, data is guaranteed stable by
-  -- ShiftCount=14, when pkt_data is registered before ShiftData loads at
+  -- Asserted at ShiftCount=11 for FIFO-consuming states.  Accounts for the
+  -- GateMate CC_FIFO_40K ASYNC-mode extra latency on the first read after a
+  -- drain-refill cycle (up to 2 A_CLK cycles).  Data is guaranteed stable by
+  -- ShiftCount=14 so that pkt_data is registered before ShiftData loads at
   -- ShiftCount=15.
   signal fifo_rd_en_r : std_logic := '0';
 
@@ -90,19 +92,27 @@ begin
     if rising_edge(clk20) then
       v_bc := to_integer(byte_count);
 
-      --  FIFO read enable 
-      -- One-cycle pulse at ShiftCount=12 while in a state that streams from the
-      -- FIFO.  ShiftCount runs 0..15 so this fires 3 cycles before the byte
-      -- boundary (ShiftCount=15), giving the FIFO 2 cycles of output latency
-      -- margin.
-      if ShiftCount = 12 and SendingPacket = '1' and
+      -- ── FIFO read enable ───────────────────────────────────────────────────
+      -- One-cycle pulse at ShiftCount=11 while in a state that streams from the
+      -- FIFO.  ShiftCount runs 0..15 so this fires 4 cycles before the byte
+      -- boundary (ShiftCount=15).
+      --
+      -- GateMate CC_FIFO_40K ASYNC-mode note: after a FIFO is completely drained
+      -- and then refilled (empty→non-empty transition), the registered block RAM
+      -- output pipeline requires one extra A_CLK cycle to settle compared with
+      -- reads from a continuously-filled FIFO.  Firing A_EN at ShiftCount=11
+      -- (previously 12) gives a 3-cycle window (edges 12, 13, 14) for A_DO to
+      -- stabilise before pkt_data is captured at edge 14 and ShiftData loads at
+      -- edge 15, accommodating both the normal 1-cycle and the drain-refill
+      -- 2-cycle latency cases.
+      if ShiftCount = 11 and SendingPacket = '1' and
         (state = DST_MAC or state = ETHER_TYPE or state = PAYLOAD) then
         fifo_rd_en_r <= '1';
       else
         fifo_rd_en_r <= '0';
       end if;
 
-      --  Data mux 
+      -- ── Data mux ──────────────────────────────────────────────────────────
       -- pkt_data is a *registered* signal.  ShiftData captures it at the byte
       -- boundary (ShiftCount=15 / v_readram='1'), meaning the value that
       -- matters is what was registered at ShiftCount=14.
@@ -146,7 +156,7 @@ begin
         v_readram := '0';
       end if;
 
-      --  Frame envelope 
+      -- ── Frame envelope ─────────────────────────────────────────────────────
       -- tx_start is asserted by the orchestrator (clk20 domain) when a full
       -- frame is queued in uart_rx_fifo and ethernet_tx is idle (tx_busy='0').
       -- payload_len is latched here so it is stable for the entire frame.
@@ -169,7 +179,7 @@ begin
         ShiftCount <= x"F";
       end if;
 
-      --  State machine 
+      -- ── State machine ──────────────────────────────────────────────────────
       if v_readram = '1' and SendingPacket = '1' then
         case state is
 
@@ -232,7 +242,7 @@ begin
         end case;
       end if;
 
-      --  Shift register 
+      -- ── Shift register ─────────────────────────────────────────────────────
       if ShiftCount(0) = '1' then
         if v_readram = '1' then
           ShiftData <= pkt_data;
@@ -241,7 +251,7 @@ begin
         end if;
       end if;
 
-      --  CRC-32 (poly 0x04C11DB7) 
+      -- ── CRC-32 (poly 0x04C11DB7) ───────────────────────────────────────────
       -- v_CRCinput is forced 0 during CRCflush so the register just shifts
       -- while CRC bits are clocked out to the wire as NOT(CRC[31]).
       if CRCflush = '1' then
@@ -274,7 +284,7 @@ begin
         end if;
       end if;
 
-      --  10Base-T Normal Link Pulse (~16 ms) 
+      -- ── 10Base-T Normal Link Pulse (~16 ms) ────────────────────────────────
       if SendingPacket = '1' then
         LinkPulseCount <= (others => '0');
       else
@@ -287,7 +297,7 @@ begin
         LinkPulse <= '0';
       end if;
 
-      --  Manchester encoder 
+      -- ── Manchester encoder ─────────────────────────────────────────────────
       SendingPacketData <= SendingPacket;
       if SendingPacketData = '1' then
         idlecount <= "000";

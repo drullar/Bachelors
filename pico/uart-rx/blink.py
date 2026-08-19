@@ -10,7 +10,7 @@ uart = UART(0, baudrate=115200, tx=Pin(0), rx=Pin(1))
 
 DST_MAC    = bytes([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])  # broadcast
 ETHER_TYPE = bytes([0x08, 0x00])                           # IPv4
-NUM_PACKETS = 100
+NUM_PACKETS = 10
 IPG_MS      = 5   # inter-packet gap in milliseconds (>> 1 ms FPGA timeout)
 
 def build_frame(payload: bytes) -> bytes:
