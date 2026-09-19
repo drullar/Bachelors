@@ -6,7 +6,7 @@ use work.custom_types_pkg.all;
 entity ethernet_controller is
   generic (
     SIMULATION            : boolean               := false;
-    ETHER_CONTROLLER_MODE : ether_controller_mode := DEFAULT_CONTROLLER_MODE;
+    ETHER_CONTROLLER_MODE : ether_controller_mode := NORMAL;
     BAUD_RATE             : integer               := 115_200
   );
   port (
@@ -81,6 +81,17 @@ architecture Behavioural of ethernet_controller is
   signal utx_fifo_data_in  : std_logic_vector(39 downto 0);
   signal utx_fifo_data_out : std_logic_vector(39 downto 0);
 
+  -- filter FIFO
+  signal filter_fifo_full        : std_logic := '0';
+  signal filter_fifo_empty       : std_logic := '0';
+  signal filter_fifo_write_en    : std_logic := '0';
+  signal filter_fifo_read_en     : std_logic := '0';
+  signal filter_fifo_data_in     : std_logic_vector(39 downto 0);
+  signal filter_fifo_data_out    : std_logic_vector(39 downto 0);
+  signal f_fifo_temp_byte        : std_logic_vector(7 downto 0);
+  signal f_fifo_read_signal      : std_logic                    := '0';
+  signal f_fifo_start_processing : std_logic                    := '0';
+  signal delete_me               : std_logic_vector(7 downto 0) := (others => '0');
   -- uart_rx FIFO
   signal urx_fifo_full      : std_logic := '0';
   signal urx_fifo_empty     : std_logic := '0';
@@ -123,6 +134,8 @@ architecture Behavioural of ethernet_controller is
   signal uart_rx_payload_len : std_logic_vector(15 downto 0) := (others => '0');
   signal uart_rx_dst_mac     : std_logic_vector(47 downto 0) := (others => '0');
   signal uart_rx_ether_type  : std_logic_vector(15 downto 0) := (others => '0');
+
+  signal all_fifos_reset : std_logic := '0';
 
   type uart_read_parse_t is (URP_IDLE, URP_LEN, URP_DST_MAC, URP_ETH_TYPE, URP_FIFO_WRITE, URP_PAYLOAD, URP_PAYLOAD_PADDING, URP_DONE); -- uart_read_parse = URP
   signal current_uart_parse_state : uart_read_parse_t := URP_IDLE;
@@ -218,7 +231,7 @@ begin
     B_DI    => utx_fifo_data_in,
     A_CLK   => clk,
     B_CLK   => clk48,
-    F_RST_N => '1',
+    F_RST_N => all_fifos_reset,
     A_EN    => utx_fifo_read_en,
     B_EN    => utx_fifo_write_en,
     B_WE    => utx_fifo_write_en,
@@ -226,7 +239,6 @@ begin
     F_FULL  => utx_fifo_full,
     F_EMPTY => utx_fifo_empty
   );
-
   uart_rx_fifo : CC_FIFO_40K -- UART -> FIFO -> ETHERNET
   generic map(
     A_WIDTH   => 10,
@@ -238,7 +250,7 @@ begin
     B_DI    => urx_fifo_data_in,
     A_CLK   => clk20,
     B_CLK   => clk48,
-    F_RST_N => '1',
+    F_RST_N => all_fifos_reset,
     A_EN    => urx_fifo_read_en,
     B_EN    => urx_fifo_write_en,
     B_WE    => urx_fifo_write_en,
@@ -258,7 +270,7 @@ begin
     B_DI    => ps_fifo_data_in,
     A_CLK   => clk20,
     B_CLK   => clk48,
-    F_RST_N => '1',
+    F_RST_N => all_fifos_reset,
     A_EN    => ps_fifo_read_en,
     B_EN    => ps_fifo_write_en,
     B_WE    => ps_fifo_write_en,
@@ -267,12 +279,12 @@ begin
     F_EMPTY => ps_fifo_empty
   );
 
-  utx_fifo_write : process (clk48) begin
+  filter_fifo_write : process (clk48) begin
     if (rising_edge(clk48)) then
-      utx_fifo_write_en <= '0';
-      if (eth_data_ready = '1' and utx_fifo_full /= '1') then
-        utx_fifo_write_en <= '1';
-        utx_fifo_data_in  <= FIFO_PADDING_32 & eth_data_out;
+      filter_fifo_write_en <= '0';
+      if (eth_data_ready = '1' and filter_fifo_full = '0') then
+        filter_fifo_write_en <= '1';
+        filter_fifo_data_in  <= FIFO_PADDING_32 & eth_data_out;
       end if;
     end if;
   end process;
@@ -522,6 +534,173 @@ begin
         when others =>
           current_uart_parse_state <= URP_IDLE;
       end case;
+    end if;
+  end process;
+
+  ethernet_rx_filter_fifo : CC_FIFO_40K
+  generic map(
+    A_WIDTH   => 10,
+    B_WIDTH   => 10,
+    FIFO_MODE => "ASYNC"
+  )port map
+  (
+  B_DI    => filter_fifo_data_in,
+  A_CLK   => clk48,
+  B_CLK   => clk48,
+  F_RST_N => all_fifos_reset,
+  A_EN    => filter_fifo_read_en,
+  B_EN    => filter_fifo_write_en,
+  B_WE    => filter_fifo_write_en,
+  A_DO    => filter_fifo_data_out,
+  F_FULL  => filter_fifo_full,
+  F_EMPTY => filter_fifo_empty
+  );
+
+  incoming_frame_filter : process (clk48)
+    -- Destination MAC storage & byte counters
+    variable v_processed_dst_mac : std_logic_vector(47 downto 0) := (others => '0');
+    variable v_dst_mac_bytes_rx  : integer range 0 to 6          := 0;
+    variable v_dst_mac_bytes_tx  : integer range 0 to 6          := 0;
+
+    -- Hardware Prefix Tracker
+    variable v_dummy_bytes_rx : integer range 0 to 2 := 0;
+
+    -- Frame tracking & Filtering
+    variable v_frame_accepted : boolean                := false;
+    variable v_idle_timeout   : integer range 0 to 255 := 0;
+
+    -- CDC synchronizer flag
+    variable v_wait_cycle : boolean := false;
+
+    -- Timeout bumped to 64 to safely cover inter-frame gaps
+    constant IDLE_TIMEOUT_THRESHOLD : integer := 64;
+
+    type processing_state is (s_DUMMY, s_DST_MAC, s_HOLD, s_OTHERS);
+    variable state : processing_state := s_DUMMY;
+  begin
+    if rising_edge(clk48) then
+      -- Default output disables
+      filter_fifo_read_en <= '0';
+      utx_fifo_write_en   <= '0';
+
+      -- 1. Inter-Frame Gap (Timeout) Logic
+      -- Only count timeout when we aren't waiting for a CDC cycle
+      if filter_fifo_empty = '1' and not v_wait_cycle and state = s_OTHERS then
+        if v_idle_timeout < 255 then
+          v_idle_timeout := v_idle_timeout + 1;
+        end if;
+      else
+        v_idle_timeout := 0;
+      end if;
+
+      -- End of frame reset
+      if v_idle_timeout = IDLE_TIMEOUT_THRESHOLD then
+        state              := s_DUMMY;
+        v_dummy_bytes_rx   := 0;
+        v_dst_mac_bytes_rx := 0;
+        v_dst_mac_bytes_tx := 0;
+        v_frame_accepted   := false;
+        v_idle_timeout     := 0;
+        v_wait_cycle       := false;
+      end if;
+
+      -- 2. FWFT Read logic with 1-Cycle CDC Throttle
+      if v_wait_cycle then
+        -- Do nothing for 1 cycle: Let the FWFT FIFO update data_out and empty flags
+        v_wait_cycle := false;
+      else
+        case state is
+          when s_DUMMY =>
+            -- Silently pop and discard the 2-byte hardware prefix (15 00)
+            if filter_fifo_empty = '0' then
+              filter_fifo_read_en <= '1';
+              v_wait_cycle := true;
+
+              v_dummy_bytes_rx := v_dummy_bytes_rx + 1;
+              if v_dummy_bytes_rx = 2 then
+                state := s_DST_MAC;
+              end if;
+            end if;
+
+          when s_DST_MAC =>
+            -- Read the ACTUAL Destination MAC
+            if filter_fifo_empty = '0' then
+              case v_dst_mac_bytes_rx is
+                when 0      => v_processed_dst_mac(47 downto 40) := filter_fifo_data_out(7 downto 0);
+                when 1      => v_processed_dst_mac(39 downto 32) := filter_fifo_data_out(7 downto 0);
+                when 2      => v_processed_dst_mac(31 downto 24) := filter_fifo_data_out(7 downto 0);
+                when 3      => v_processed_dst_mac(23 downto 16) := filter_fifo_data_out(7 downto 0);
+                when 4      => v_processed_dst_mac(15 downto 8)  := filter_fifo_data_out(7 downto 0);
+                when 5      => v_processed_dst_mac(7 downto 0)   := filter_fifo_data_out(7 downto 0);
+                when others => null;
+              end case;
+
+              filter_fifo_read_en <= '1';
+              v_wait_cycle       := true;
+              v_dst_mac_bytes_rx := v_dst_mac_bytes_rx + 1;
+
+              if v_dst_mac_bytes_rx = 6 then
+                if (v_processed_dst_mac = FPGA_MAC_ADDRESS or v_processed_dst_mac(40) = '1') then
+                  v_frame_accepted   := true;
+                  state              := s_HOLD;
+                  v_dst_mac_bytes_tx := 0;
+                else
+                  v_frame_accepted := false;
+                  state            := s_OTHERS; -- Drain rejected frame
+                end if;
+              end if;
+            end if;
+
+          when s_HOLD =>
+            -- Transmit stored Destination MAC to utx_fifo
+            if utx_fifo_full = '0' then
+              utx_fifo_write_en <= '1';
+              case v_dst_mac_bytes_tx is
+                when 0 => utx_fifo_data_in      <= FIFO_PADDING_32 & v_processed_dst_mac(47 downto 40);
+                when 1 => utx_fifo_data_in      <= FIFO_PADDING_32 & v_processed_dst_mac(39 downto 32);
+                when 2 => utx_fifo_data_in      <= FIFO_PADDING_32 & v_processed_dst_mac(31 downto 24);
+                when 3 => utx_fifo_data_in      <= FIFO_PADDING_32 & v_processed_dst_mac(23 downto 16);
+                when 4 => utx_fifo_data_in      <= FIFO_PADDING_32 & v_processed_dst_mac(15 downto 8);
+                when 5 => utx_fifo_data_in      <= FIFO_PADDING_32 & v_processed_dst_mac(7 downto 0);
+                when others => utx_fifo_data_in <= (others => '0');
+              end case;
+
+              v_dst_mac_bytes_tx := v_dst_mac_bytes_tx + 1;
+              if v_dst_mac_bytes_tx = 6 then
+                state := s_OTHERS;
+              end if;
+            end if;
+
+          when s_OTHERS =>
+            -- Forward or drain the remainder of the payload
+            if filter_fifo_empty = '0' then
+              if v_frame_accepted then
+                if utx_fifo_full = '0' then
+                  utx_fifo_write_en   <= '1';
+                  utx_fifo_data_in    <= FIFO_PADDING_32 & filter_fifo_data_out(7 downto 0);
+                  filter_fifo_read_en <= '1';
+                  v_wait_cycle := true;
+                end if;
+              else
+                -- Drop bytes if frame is rejected
+                filter_fifo_read_en <= '1';
+                v_wait_cycle := true;
+              end if;
+            end if;
+        end case;
+      end if;
+
+      -- Synthesis prevention dummy signal
+      delete_me <= filter_fifo_data_out(7 downto 0);
+
+    end if;
+  end process;
+
+  initial_reset_fifo : process (clk48) begin
+    if rising_edge(clk48) then
+      if (all_fifos_reset = '0') then
+        all_fifos_reset <= '1';
+      end if;
     end if;
   end process;
 

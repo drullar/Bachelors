@@ -45,13 +45,10 @@ begin
     );
 
   pico_sim : entity work.pico_sim
-    port map
-    (
-      clk     => clk48,
-      rst     => '0',
-      tx_line => pico_uart_out,
-      tx_done => open
-    );
+  port map(
+    clk => clk10,
+    data_out => pico_uart_out
+  );
 
   ethernet_rx_debug : entity work.ethernet_rx
     generic map(
@@ -98,14 +95,4 @@ begin
     end loop;
     wait;
   end process;
-
-  -- 7. Stimulus
-  --  stim_proc : process
-  --   begin
-  --     rst_n <= '0';
-  --     wait for 100 ns;
-  --     rst_n <= '1';
-  --     wait;
-  --   end process;
-
 end behavior;

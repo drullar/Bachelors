@@ -23,7 +23,6 @@ architecture Behavioral of ethernet_rx is
   constant PREAMBLE   : rx_frame_header := "0001";
   constant SFD        : rx_frame_header := "0010";
   constant DST_MAC    : rx_frame_header := "0011";
-  constant TX_DST_MAC : rx_frame_header := "0111";
   constant SRC_MAC    : rx_frame_header := "0100";
   constant ETHER_TYPE : rx_frame_header := "0101";
   constant DATA       : rx_frame_header := "0110";
@@ -51,7 +50,6 @@ begin
     variable dst_mac_bytes          : integer                       := 0;
     variable preamble_bytes         : integer                       := 0;
     variable invert_read_bits       : boolean                       := false;
-    variable tx_dst_mac_cnt         : integer                       := 0;
     variable frame_dst_mac          : std_logic_vector(47 downto 0) := (others => '0');
   begin
     if rising_edge(clk48) then
@@ -134,51 +132,31 @@ begin
                       header_switch_state_debug <= '1';
                       current_header            <= INVALID;
                     end if;
-                  when DST_MAC =>
-                    if (invert_read_bits) then
-                      temp_byte := not data_reg;
-                    else
-                      temp_byte := data_reg;
-                    end if;
-                    case dst_mac_bytes is
-                      when 0      => frame_dst_mac(47 downto 40) := temp_byte;
-                      when 1      => frame_dst_mac(39 downto 32) := temp_byte;
-                      when 2      => frame_dst_mac(31 downto 24) := temp_byte;
-                      when 3      => frame_dst_mac(23 downto 16) := temp_byte;
-                      when 4      => frame_dst_mac(15 downto 8)  := temp_byte;
-                      when 5      => frame_dst_mac(7 downto 0)   := temp_byte;
-                      when others => null;
-                    end case;
-                    dst_mac_bytes := dst_mac_bytes + 1;
-                    if (dst_mac_bytes = 6) then
-                      if (frame_dst_mac = FPGA_MAC_ADDRESS or frame_dst_mac(40) = '1') then
-                        header_switch_state_debug <= '1';
-                        current_header            <= TX_DST_MAC;
-                      else
-                        current_header <= INVALID;
-                      end if;
-                      dst_mac_bytes := 0;
-                    end if;
-                  when TX_DST_MAC =>
-                    case tx_dst_mac_cnt is
-                      when 0 => temp_byte := frame_dst_mac(47 downto 40);
-                      when 1 => temp_byte := frame_dst_mac(39 downto 32);
-                      when 2 => temp_byte := frame_dst_mac(31 downto 24);
-                      when 3 => temp_byte := frame_dst_mac(23 downto 16);
-                      when 4 => temp_byte := frame_dst_mac(15 downto 8);
-                      when 5 =>
-                        temp_byte := frame_dst_mac(7 downto 0);
-                        current_header <= SRC_MAC;
-                      when others => null;
-                    end case;
-
-                    case tx_dst_mac_cnt is
-                      when 0 to 4 => tx_dst_mac_cnt := tx_dst_mac_cnt + 1;
-                      when others => tx_dst_mac_cnt := 0;
-                    end case;
-
-                    data_done      <= temp_byte;
-                    data_out_valid <= '1';
+                    -- when DST_MAC =>
+                    --   if (invert_read_bits) then
+                    --     temp_byte := not data_reg;
+                    --   else
+                    --     temp_byte := data_reg;
+                    --   end if;
+                    --   case dst_mac_bytes is
+                    --     when 0      => frame_dst_mac(47 downto 40) := temp_byte;
+                    --     when 1      => frame_dst_mac(39 downto 32) := temp_byte;
+                    --     when 2      => frame_dst_mac(31 downto 24) := temp_byte;
+                    --     when 3      => frame_dst_mac(23 downto 16) := temp_byte;
+                    --     when 4      => frame_dst_mac(15 downto 8)  := temp_byte;
+                    --     when 5      => frame_dst_mac(7 downto 0)   := temp_byte;
+                    --     when others => null;
+                    --   end case;
+                    --   dst_mac_bytes := dst_mac_bytes + 1;
+                    --   if (dst_mac_bytes = 6) then
+                    --     if (frame_dst_mac = FPGA_MAC_ADDRESS or frame_dst_mac(40) = '1') then
+                    --       header_switch_state_debug <= '1';
+                    --       current_header            <= SRC_MAC;
+                    --     else
+                    --       current_header <= INVALID;
+                    --     end if;
+                    --     dst_mac_bytes := 0;
+                    --   end if;
                   when others =>
                     if (invert_read_bits) then
                       temp_byte := not data_reg;
@@ -219,7 +197,6 @@ begin
         frame_dst_mac  := (others => '0');
         preamble_bytes := 0;
         dst_mac_bytes  := 0;
-        tx_dst_mac_cnt := 0;
         temp_byte      := (others => '0');
       end if;
 
