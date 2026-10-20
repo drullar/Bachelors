@@ -12,3 +12,4 @@
 **/log/*.log
 **/net/*
 **/*vcd
+fpga/cc-toolchain-win/bin/
